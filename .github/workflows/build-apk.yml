@@ -1,0 +1,42 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodni yuklab olish
+        uses: actions/checkout@v4
+
+      - name: Node.js o'rnatish
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Java (JDK 17) o'rnatish
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Android SDK sozlash
+        uses: android-actions/setup-android@v3
+
+      - name: Cordova o'rnatish
+        run: npm install -g cordova
+
+      - name: Android platformasini qo'shish
+        run: cordova platform add android
+
+      - name: APK yasash (debug)
+        run: cordova build android --no-telemetry
+
+      - name: Tayyor APK ni saqlash
+        uses: actions/upload-artifact@v4
+        with:
+          name: bilim-va-mukofot-apk
+          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
