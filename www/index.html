@@ -1,2614 +1,963 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bilim va Mukofot V4</title>
-
+<title>Bilim Ustoz V9 Android</title>
 <style>
 *{box-sizing:border-box}
-
-body{
- margin:0;
- font-family:Arial,sans-serif;
- background:linear-gradient(135deg,#eaf5ff,#f8fbff);
- color:#18324a;
+:root{
+ --bg:#f4f8fc;--card:#fff;--text:#19324a;--muted:#6b7c8f;--blue:#1769aa;
+ --green:#1f9d68;--orange:#f59e0b;--red:#d63f3f;--line:#dfe8f0;--soft:#eef6ff;
 }
+body{margin:0;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);font-family:Arial,sans-serif;background:linear-gradient(135deg,#eaf5ff,#fbfdff);color:var(--text)}
+.wrap{max-width:1180px;margin:auto;padding:14px;min-height:100vh}
+header,.card{background:var(--card);border-radius:22px;box-shadow:0 8px 28px #00000010}
+header{padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:8px;z-index:5}
+h1,h2,h3{margin-top:0}.brand{font-size:25px;font-weight:800;color:var(--blue)}.muted{color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border-radius:12px;padding:8px 12px;font-weight:700}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+button{border:0;border-radius:13px;padding:11px 16px;font-weight:700;font-size:15px;cursor:pointer}
+button:hover{filter:brightness(.97)}.primary{background:var(--blue);color:#fff}.green{background:var(--green);color:#fff}
+.orange{background:var(--orange);color:#fff}.red{background:var(--red);color:#fff}.gray{background:#e9eff5;color:var(--text)}
+.nav{background:#fff;box-shadow:0 3px 12px #00000010}.nav.active{background:var(--blue);color:#fff}
+.card{padding:20px;margin-bottom:16px}.screen{display:none}.screen.active{display:block}.hidden{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat,.tile{background:#f6faff;border:1px solid #e5eef6;border-radius:16px;padding:15px}.stat b{display:block;font-size:24px;margin-top:5px}
+input,select,textarea{width:100%;padding:12px 13px;border:2px solid var(--line);border-radius:12px;font-size:15px;margin:5px 0 12px;background:#fff}
+textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+.profile{display:flex;align-items:center;gap:13px;border:2px solid var(--line);padding:14px;border-radius:17px;margin:9px 0}
+.avatar{font-size:38px}.profile .info{flex:1}.task{border:1px solid var(--line);border-radius:16px;padding:15px;margin:10px 0}
+.notice{background:#fff8dc;color:#6c5600;border-radius:14px;padding:13px;margin-bottom:12px}.success{color:#168753;font-weight:700}.error{color:#d33;font-weight:700}
+.hero{text-align:center;padding:28px 20px}.hero .big{font-size:58px}.subjectGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.subject{padding:18px 10px;border:2px solid var(--line);border-radius:18px;text-align:center;cursor:pointer;background:#fff;font-weight:700}
+.subject:hover,.subject.selected{border-color:var(--blue);background:#f1f8ff}.subject span{display:block;font-size:34px;margin-bottom:7px}
+.lessonBox{max-width:760px;margin:auto;background:#fff;border-radius:22px;border:1px solid #e6eef5;padding:22px}
+.lessonText{font-size:19px;line-height:1.6}.question{font-size:30px;font-weight:800;text-align:center;margin:25px 0;line-height:1.4}
+.answer{max-width:420px;margin:auto;display:block;text-align:center;font-size:24px}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:560px;margin:15px auto}
+.choice{background:#f6faff;border:2px solid var(--line);padding:15px;border-radius:14px}.progress{height:13px;background:#e7edf3;border-radius:30px;overflow:hidden}.progress>div{height:100%;background:var(--green);width:0}
+.level{font-size:14px;color:#6a7d90}.stars{font-size:26px}.center{text-align:center}.sep{height:1px;background:#edf1f4;margin:15px 0}
+.pill{display:inline-block;padding:7px 10px;border-radius:999px;background:#eef6ff;margin:3px;font-size:13px;font-weight:700}
+.login{max-width:500px;margin:60px auto}.loginChoice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.loginChoice button{padding:22px 10px;font-size:18px}.gameCard{background:#f9fbfd;border:2px solid #e6edf4;border-radius:18px;padding:18px;text-align:center}
+.small{font-size:13px}.dangerZone{border:1px dashed #e4b1b1;background:#fff7f7}.topActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.subjectGrid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:520px){header{position:static;display:block}.topActions{justify-content:flex-start;margin-top:10px}.grid{grid-template-columns:1fr 1fr}.question{font-size:24px}.choices{grid-template-columns:1fr}.loginChoice{grid-template-columns:1fr}}
 
-.app{
- max-width:1100px;
- margin:auto;
- padding:18px;
-}
-
-header,.card{
- background:white;
- border-radius:22px;
- box-shadow:0 8px 30px #0001;
-}
-
-header{
- padding:20px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:15px;
-}
-
-h1{margin:0;color:#1769aa}
-.sub{color:#64748b;margin-top:6px}
-
-nav{
- display:flex;
- gap:10px;
- flex-wrap:wrap;
- margin:18px 0;
-}
-
-button{
- border:0;
- border-radius:13px;
- padding:12px 18px;
- font-weight:bold;
- cursor:pointer;
- font-size:16px;
-}
-
-.nav{
- background:#fff;
- box-shadow:0 3px 12px #0001;
-}
-
-.nav.active{
- background:#1769aa;
- color:white;
-}
-
-.primary{background:#1769aa;color:white}
-.green{background:#20a36a;color:white}
-.orange{background:#f59e0b;color:white}
-.red{background:#d83d3d;color:white}
-.gray{background:#e8eef4}
-
-.card{
- padding:22px;
- margin-bottom:16px;
-}
-
-.screen{display:none}
-.screen.active{display:block}
-
-.grid{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:12px;
-}
-
-.stat{
- background:#f4f9ff;
- border-radius:17px;
- padding:16px;
-}
-
-.stat b{
- display:block;
- font-size:23px;
- margin-top:6px;
-}
-
-input,textarea,select{
- width:100%;
- padding:13px;
- border:2px solid #dce6ee;
- border-radius:12px;
- font-size:16px;
- margin:5px 0 12px;
-}
-
-textarea{min-height:100px}
-
-.task{
- border:1px solid #e1e9f0;
- border-radius:16px;
- padding:16px;
- margin:10px 0;
-}
-
-.badge{
- display:inline-block;
- background:#edf6ff;
- padding:8px 12px;
- border-radius:12px;
- font-weight:bold;
-}
-
-.reward{
- color:#138a55;
- font-weight:bold;
-}
-
-.notice{
- background:#fff7d9;
- color:#725900;
- padding:14px;
- border-radius:14px;
- margin-bottom:14px;
-}
-
-.success{
- color:#168753;
- font-weight:bold;
-}
-
-.error{
- color:#d33;
- font-weight:bold;
-}
-
-.hidden{display:none!important}
-
-/* ===============================
-   BOLA SAVOL OYNASI
-================================ */
-
-.questionBox{
- max-width:650px;
- margin:20px auto;
- text-align:center;
- padding:30px 20px;
- border-radius:25px;
- background:linear-gradient(135deg,#f4faff,#ffffff);
- box-shadow:0 8px 30px #0001;
-}
-
-.questionNumber{
- font-size:20px;
- color:#1769aa;
- font-weight:bold;
- margin-bottom:10px;
-}
-
-.questionText{
- font-size:30px;
- font-weight:bold;
- line-height:1.5;
- margin:25px 0;
-}
-
-.answerInput{
- text-align:center;
- font-size:28px;
- max-width:350px;
- margin:auto;
- display:block;
-}
-
-.nextButton{
- margin-top:20px;
- font-size:20px;
- padding:15px 35px;
-}
-
-.bigResult{
- text-align:center;
- padding:30px;
-}
-
-.resultNumber{
- font-size:45px;
- font-weight:bold;
- color:#1769aa;
-}
-
-.starResult{
- font-size:30px;
- color:#f59e0b;
-}
-
-.moneyResult{
- font-size:28px;
- color:#168753;
- font-weight:bold;
- margin:15px 0;
-}
-
-.progress{
- height:14px;
- background:#e7edf3;
- border-radius:20px;
- overflow:hidden;
- margin:15px 0;
-}
-
-.progress div{
- height:100%;
- background:#20a36a;
- width:0%;
- transition:.3s;
-}
-
-.profile{
- display:flex;
- align-items:center;
- gap:15px;
- padding:15px;
- border:2px solid #e2eaf1;
- border-radius:17px;
- margin:9px 0;
- cursor:pointer;
-}
-
-.profile.selected{
- border-color:#1769aa;
- background:#f1f8ff;
-}
-
-.avatar{
- font-size:40px;
-}
-
-@media(max-width:750px){
-
- header{display:block}
-
- .grid{
-  grid-template-columns:repeat(2,1fr);
- }
-
- .questionText{
-  font-size:25px;
- }
-
+.appBottomSpace{height:26px}
+@media(max-width:700px){
+  body{font-size:15px}
+  header{border-radius:0 0 20px 20px;margin:0 -14px;padding-left:16px;padding-right:16px}
+  nav{position:sticky;top:0;z-index:4;background:#f4f8fcdd;backdrop-filter:blur(8px);padding:8px 0}
+  .nav{flex:1;min-width:105px;padding:10px 8px;font-size:13px}
+  .card{padding:16px;border-radius:18px}
+  .subject{min-height:104px;display:flex;flex-direction:column;justify-content:center}
+  button{min-height:44px}
+  input,select,textarea{font-size:16px}
 }
 </style>
 </head>
-
 <body>
+<div class="wrap">
 
-<div class="app">
+<section id="loginScreen" class="screen active">
+  <div class="login card">
+    <div class="hero">
+      <div class="big">рџЋ“</div>
+      <div class="brand">Bilim Ustoz V9 Android</div>
+      <p class="muted">Dars вЂў Mashq вЂў Test вЂў Mantiqiy oвЂyin вЂў Mukofot</p><div class="pill">рџ“± Android versiya</div>
+    </div>
+    <div class="loginChoice">
+      <button class="primary" onclick="showParentLogin()">рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§ Ota-ona</button>
+      <button class="green" onclick="showChildLogin()">рџ§’ Bola</button>
+    </div>
+    <div id="loginArea" style="margin-top:16px"></div>
+  </div>
+</section>
 
+<section id="appScreen" class="screen">
 <header>
-
-<div>
-
-<h1>🌟 Bilim va Mukofot</h1>
-
-<div class="sub">
-O‘qish • uy ishlari • ball • mukofot
-</div>
-
-</div>
-
-<div class="badge">
-👦 <span id="headerChild">Bola tanlanmagan</span>
-</div>
-
+ <div><div class="brand">рџЋ“ Bilim Ustoz V9 Android</div><div class="muted" id="headerSub">Aqlli oвЂquv tizimi</div></div>
+ <div class="topActions">
+   <span class="badge" id="headerUser">вЂ”</span>
+   <button class="gray" onclick="logout()">Chiqish</button>
+ </div>
 </header>
+<nav id="mainNav"></nav>
 
-
-<nav>
-
-<button class="nav active"
-onclick="openPage('child',this)">
-👦 Bola
-</button>
-
-<button class="nav"
-onclick="openPage('parent',this)">
-👨‍👩‍👧 Ota-ona
-</button>
-
-<button class="nav"
-onclick="openPage('stats',this)">
-📊 Statistika
-</button>
-
-</nav>
-
-
-<!-- =================================================
-BOLA
-================================================= -->
-
-<section id="child" class="screen active">
-
-<div class="card">
-
-<h2>👦 Bola profilini tanlang</h2>
-
-<div id="childrenList"></div>
-
-</div>
-
-
-<div id="childPanel" class="hidden">
-
-<div class="card">
-
-<div class="grid">
-
-<div class="stat">
-⭐ Bugungi ball
-<b id="todayPoints">0</b>
-</div>
-
-<div class="stat">
-💰 Bugungi pul
-<b id="todayMoney">0</b>
-</div>
-
-<div class="stat">
-🏦 Jamg‘arma
-<b id="balance">0</b>
-</div>
-
-<div class="stat">
-🏠 Uy ishlari
-<b id="homeCount">0</b>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =========================================
-   YANGI: BITTADAN SAVOL
-========================================= -->
-
-<div class="card">
-
-<h2>📚 Bugungi dars</h2>
-
-<div id="lessonArea"></div>
-
-</div>
-
-
-<!-- =========================================
-   UY ISHLARI
-========================================= -->
-
-<div class="card">
-
-<h2>🏠 Bugungi uy ishlari</h2>
-
-<div id="homeList"></div>
-
-</div>
-
-</div>
-
+<section id="childHome" class="screen">
+ <div class="card">
+   <div class="grid">
+    <div class="stat">в­ђ Jami ball<b id="cPoints">0</b></div>
+    <div class="stat">рџ’° JamgвЂarma<b id="cMoney">0</b></div>
+    <div class="stat">рџ”Ґ Ketma-ket kun<b id="cStreak">0</b></div>
+    <div class="stat">вњ… Bajarilgan<b id="cDone">0</b></div>
+   </div>
+ </div>
+ <div class="card">
+   <h2>рџ“љ Nima qilamiz?</h2>
+   <div class="subjectGrid" id="subjectGrid"></div>
+ </div>
+ <div class="card">
+   <h2>рџЋЇ Bugungi aqlli tavsiya</h2>
+   <div id="dailyRecommendation" class="notice">Natijalaringizga qarab tavsiya shu yerda chiqadi.</div>
+ </div>
+ <div class="card"><h2>рџ“Њ Ota-ona bergan topshiriqlar</h2><div id="childAssignments"></div></div>
+ <div class="card"><h2>рџЏ  Uy ishlari</h2><div id="childHomes"></div></div>
 </section>
 
-
-
-<!-- =================================================
-OTA ONA
-================================================= -->
-
-<section id="parent" class="screen">
-
-<div class="card" id="loginBox">
-
-<h2>🔐 Ota-ona paneli</h2>
-
-
-
-<input id="pinInput"
-type="password"
-maxlength="4"
-placeholder="PIN kod">
-
-<button class="primary"
-onclick="loginParent()">
-Kirish
-</button>
-
-<div id="loginError"></div>
-
-</div>
-
-
-<div id="parentPanel" class="hidden">
-
-
-<!-- BOLA YARATISH -->
-
-<div class="card">
-
-<h2>👶 Bolalar</h2>
-
-<input id="childName"
-placeholder="Bolaning ismi">
-
-<select id="childAvatar">
-<option>👦</option>
-<option>👧</option>
-<option>🧒</option>
-</select>
-
-<button class="green"
-onclick="createChild()">
-➕ Bola qo‘shish
-</button>
-
-</div>
-
-
-<!-- =========================================
-   AVTOMATIK TOPSHIRIQLAR
-========================================= -->
-
-<div class="card">
-
-<h2>🤖 Bugungi kunni o‘zing tayyorla</h2>
-
-<div class="notice">
-
-Ota-ona faqat mavzuni tanlaydi.
-Dastur 10 ta turli topshiriqni
-o‘zi yaratadi.
-
-</div>
-
-<label>Bola</label>
-<select id="autoChild"></select>
-
-<label>Sinf</label>
-<select>
-<option>1-sinf</option>
-</select>
-
-<label>Fan</label>
-<select id="autoSubject">
-
-<option>Matematika</option>
-<option>O‘qish</option>
-<option>Ona tili</option>
-
-</select>
-
-<label>Mavzu</label>
-
-<select id="autoTopic">
-
-<option value="add10">
-10 ichida qo‘shish
-</option>
-
-<option value="sub10">
-10 ichida ayirish
-</option>
-
-<option value="compare10">
-Sonlarni taqqoslash
-</option>
-
-<option value="mixed10">
-10 ichida aralash
-</option>
-
-</select>
-
-<label>
-Har bir topshiriq balli
-</label>
-
-<input id="autoPoints"
-type="number"
-value="10">
-
-<button class="primary"
-onclick="generateToday()">
-
-🤖 10 ta topshiriq yaratish
-
-</button>
-
-<div id="generatorResult"></div>
-
-</div>
-
-
-<!-- =========================================
-   QO‘LDA TOPSHIRIQ
-========================================= -->
-
-<div class="card">
-
-<h2>✍️ O‘zingiz topshiriq qo‘shing</h2>
-
-<select id="manualChild"></select>
-
-<input id="manualSubject"
-placeholder="Fan / mavzu">
-
-<textarea id="manualQuestion"
-placeholder="Masalan: 5 + 3 = ?"></textarea>
-
-<input id="manualAnswer"
-placeholder="To‘g‘ri javob">
-
-<input id="manualPoints"
-type="number"
-value="10">
-
-<button class="primary"
-onclick="addManualLesson()">
-
-➕ Topshiriq berish
-
-</button>
-
-</div>
-
-
-<!-- =========================================
-   UY ISHI
-========================================= -->
-
-<div class="card">
-
-<h2>🏠 Uy ishi yaratish</h2>
-
-<select id="homeChild"></select>
-
-<input id="homeTitle"
-placeholder="Masalan: Xonasini tozalash">
-
-<input id="homeReward"
-type="number"
-value="1000"
-placeholder="Mukofot so‘mda">
-
-<label>
-
-<input id="dailyRepeat"
-type="checkbox">
-
-Har kuni avtomatik chiqsin
-
-</label>
-
-<br><br>
-
-<button class="green"
-onclick="addHomeWork()">
-
-➕ Uy ishini qo‘shish
-
-</button>
-
-</div>
-
-
-<!-- =========================================
-   TASDIQLASH
-========================================= -->
-
-<div class="card">
-
-<h2>✅ Tasdiqlanishi kerak</h2>
-
-<div id="pending"></div>
-
-</div>
-
-
-<!-- =========================================
-   BUGUNGI TOPSHIRIQLAR
-========================================= -->
-
-<div class="card">
-
-<h2>📋 Bugungi topshiriqlar</h2>
-
-<div id="parentLessons"></div>
-
-</div>
-
-</div>
-
+<section id="learn" class="screen">
+ <div class="card">
+   <div class="row">
+    <div><h2 id="learnTitle">Dars</h2><div class="level" id="levelInfo"></div></div>
+    <div class="center">
+      <button class="primary" onclick="startMode('lesson')">рџ“– Dars</button>
+      <button class="green" onclick="startMode('practice')">вњЏпёЏ Mashq</button>
+      <button class="orange" onclick="startMode('test')">рџ“ќ Test</button>
+    </div>
+   </div>
+ </div>
+ <div class="card hidden" id="languageRoadmapCard">
+   <h2>рџ—є Til oвЂrganish yoвЂli</h2>
+   <div id="languageRoadmap"></div>
+ </div>
+ <div class="card"><div id="learningArea"></div></div>
 </section>
 
-
-
-<!-- =================================================
-STATISTIKA
-================================================= -->
-
-<section id="stats" class="screen">
-
-<div class="card">
-
-<h2>📊 Umumiy statistika</h2>
-
-<div class="grid">
-
-<div class="stat">
-⭐ Jami ball
-<b id="allPoints">0</b>
-</div>
-
-<div class="stat">
-💰 Jami pul
-<b id="allMoney">0</b>
-</div>
-
-<div class="stat">
-📚 Darsdan
-<b id="lessonMoney">0</b>
-</div>
-
-<div class="stat">
-🏠 Uy ishidan
-<b id="homeMoney">0</b>
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>👶 Bolalar natijasi</h2>
-
-<div id="childrenStats"></div>
-
-</div>
-
+<section id="games" class="screen">
+ <div class="card">
+  <h2>рџЋ® Aqlli oвЂyinlar markazi</h2>
+  <p class="muted">Diqqat, xotira, tez fikrlash, til va hisob koвЂnikmalarini rivojlantiradi.</p>
+  <div class="grid2">
+   <div class="gameCard"><h3>рџ§  Xotira kartalari</h3><p>Bir xil juftlarni toping.</p><button class="primary" onclick="startMemoryGame()">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ”ў Ketma-ketlik</h3><p>Sonlar orasidagi qonuniyatni toping.</p><button class="green" onclick="startGame('sequence')">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ§© Ortiqchasini top</h3><p>Mantiqan mos kelmaydiganini toping.</p><button class="orange" onclick="startGame('odd')">Boshlash</button></div>
+   <div class="gameCard"><h3>вљЎ Tez hisob</h3><p>30 soniyada iloji boricha koвЂp javob bering.</p><button class="primary" onclick="startSpeedGame()">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ”¤ SoвЂz tuzish</h3><p>Aralash harflardan soвЂz yigвЂing.</p><button class="green" onclick="startGame('word')">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ‡¬рџ‡§ English Match</h3><p>Inglizcha soвЂzni oвЂzbekcha maвЂ™nosi bilan moslang.</p><button class="orange" onclick="startLanguageMatch('english')">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ‡·рџ‡є Р СѓСЃСЃРєРёР№ Match</h3><p>Ruscha soвЂzni oвЂzbekcha maвЂ™nosi bilan moslang.</p><button class="primary" onclick="startLanguageMatch('russian')">Boshlash</button></div>
+   <div class="gameCard"><h3>рџ‘‚ Eshitib top</h3><p>SoвЂzni eshiting va toвЂgвЂri javobni tanlang.</p><button class="green" onclick="startListeningGame()">Boshlash</button></div>
+  </div>
+ </div>
+ <div class="card"><div id="gameArea" class="center notice">OвЂyinlardan birini tanlang.</div></div>
 </section>
 
-</div>
+<section id="childStats" class="screen">
+ <div class="card"><h2>рџ“Љ Mening natijalarim</h2><div id="childStatsBox"></div></div>
+</section>
 
+<section id="parentDash" class="screen">
+ <div class="card">
+  <div class="grid">
+   <div class="stat">рџ‘¶ Bolalar<b id="pChildren">0</b></div>
+   <div class="stat">рџ“љ Bajarilgan<b id="pAnswers">0</b></div>
+   <div class="stat">в­ђ Ball<b id="pPoints">0</b></div>
+   <div class="stat">рџ’° Mukofot<b id="pMoney">0</b></div>
+  </div>
+ </div>
+ <div class="card"><h2>рџ§  OвЂqish tahlili</h2><div id="parentAnalysis"></div></div>
+ <div class="card"><h2>рџ“€ Oxirgi faoliyat</h2><div id="recentActivity"></div></div>
+</section>
+
+<section id="parentChildren" class="screen">
+ <div class="card">
+  <h2>рџ‘¶ Bola qoвЂshish / profil sozlamalari</h2>
+  <div class="grid2">
+   <div>
+    <label>Ism</label><input id="childName" placeholder="Bolaning ismi">
+    <label>Avatar</label><select id="childAvatar"><option>рџ‘¦</option><option>рџ‘§</option><option>рџ§’</option><option>рџ‘©вЂЌрџЋ“</option><option>рџ‘ЁвЂЌрџЋ“</option></select>
+    <label>Sinf</label><select id="childGrade"><option value="1">1-sinf</option><option value="2">2-sinf</option><option value="3">3-sinf</option><option value="4">4-sinf</option><option value="5">5-sinf</option><option value="6">6-sinf</option><option value="7">7-sinf</option><option value="8">8-sinf</option><option value="9">9-sinf</option><option value="10">10-sinf</option><option value="11">11-sinf</option></select>
+   </div>
+   <div>
+    <label>Bola uchun PIN (4 raqam)</label><input id="childPin" maxlength="4" inputmode="numeric" placeholder="Masalan: 2580">
+    <label>1 ball necha soвЂm?</label><input id="pointRate" type="number" value="100">
+    <label>Izoh</label><input id="childNote" placeholder="Qiziqishi yoki eslatma">
+   </div>
+  </div>
+  <button class="green" onclick="saveChild()">вћ• Bola qoвЂshish</button>
+ </div>
+ <div class="card"><h2>рџ“‹ Bolalar</h2><div id="childrenManage"></div></div>
+</section>
+
+<section id="parentAssign" class="screen">
+ <div class="card">
+  <h2>рџ“ќ Bolaga topshiriq berish</h2>
+  <div class="grid2">
+   <div>
+    <label>Bola</label><select id="assignChild"></select>
+    <label>Tur</label><select id="assignType"><option value="lesson">Dars</option><option value="practice">Mashq</option><option value="test">Test</option><option value="custom">Maxsus topshiriq</option></select>
+    <label>Fan</label><select id="assignSubject">
+<option value="math">Matematika</option>
+<option value="uzbek">Ona tili</option>
+<option value="reading">OвЂqish</option>
+<option value="writing">Husnixat</option>
+<option value="english">Ingliz tili</option>
+<option value="russian">Rus tili</option>
+<option value="literature">Adabiyot</option>
+<option value="history">Tarix</option>
+<option value="geography">Geografiya</option>
+<option value="biology">Biologiya</option>
+<option value="physics">Fizika</option>
+<option value="chemistry">Kimyo</option>
+<option value="informatics">Informatika</option>
+<option value="logic">Mantiq</option>
+</select>
+   </div>
+   <div>
+    <label>Mavzu</label><input id="assignTopic" placeholder="Masalan: 20 ichida qoвЂshish">
+    <label>Nechta savol? (0 = cheksiz mashq)</label><input id="assignCount" type="number" value="10" min="0">
+    <label>Bonus ball</label><input id="assignBonus" type="number" value="50">
+   </div>
+  </div>
+  <textarea id="assignNote" placeholder="Ota-onadan izoh yoki maxsus topshiriq"></textarea>
+  <button class="primary" onclick="addAssignment()">рџ“Њ Topshiriq berish</button>
+  <button class="green" onclick="generateAIAssignment()">вњЁ AI yordamida yaratish</button>
+  <div id="assignResult"></div>
+ </div>
+ <div class="card"><h2>рџ“љ Berilgan topshiriqlar</h2><div id="assignmentList"></div></div>
+</section>
+
+<section id="parentHome" class="screen">
+ <div class="card">
+  <h2>рџЏ  Uy ishi va mukofot</h2>
+  <label>Bola</label><select id="homeChild"></select>
+  <label>Uy ishi</label><input id="homeTitle" placeholder="Masalan: Xonasini yigвЂish">
+  <label>Mukofot</label><input id="homeReward" type="number" value="1000">
+  <label><input id="homeRepeat" type="checkbox" style="width:auto"> Har kuni qaytarilsin</label><br><br>
+  <button class="green" onclick="addHome()">вћ• QoвЂshish</button>
+ </div>
+ <div class="card"><h2>вњ… Tasdiqlash</h2><div id="pendingHomes"></div></div>
+</section>
+
+<section id="parentAI" class="screen">
+ <div class="card">
+  <h2>рџ¤– SunвЂ™iy intellekt sozlamalari</h2>
+  <div class="notice"><b>1вЂ“11-sinf rejimi:</b> fanlar bolaning sinfiga qarab avtomatik chiqadi. Lokal generator bazaviy savollar beradi. Haqiqiy AI server ulansa, sinf, fan, mavzu, oldingi xatolar va darajaga mos yangi dars, test, savol va mantiqiy oвЂyinlarni tashqi AI yaratishi mumkin. API kalitini HTML ichiga yozmang вЂ” server tomonda saqlang.</div>
+  <label>AI rejimi</label>
+  <select id="aiMode"><option value="local">Aqlli lokal generator (internet shart emas)</option><option value="server">Tashqi AI server</option></select>
+  <label>AI server manzili</label><input id="aiUrl" placeholder="Masalan: http://127.0.0.1:3000/generate">
+  <label>Standart til</label><select id="aiLang"><option value="uz">OвЂzbek</option><option value="en">English</option></select>
+  <button class="primary" onclick="saveAISettings()">рџ’ѕ Saqlash</button>
+  <button class="gray" onclick="testAI()">рџ§Є Tekshirish</button>
+  <div id="aiStatus"></div>
+ </div>
+ <div class="card">
+  <h2>вњЁ AI generator</h2>
+  <label>Bola</label><select id="aiChild"></select>
+  <label>SoвЂrov</label><textarea id="aiPrompt" placeholder="Masalan: Ingliz tilini 0 dan oвЂrganayotgan 1-sinf bola uchun 5 ta dars, 10 ta mashq va 2 ta oвЂyin yarat"></textarea>
+  <button class="green" onclick="runAIGenerator()">вњЁ Yaratish</button>
+  <div id="aiOutput"></div>
+ </div>
+</section>
+
+<section id="parentSettings" class="screen">
+ <div class="card">
+  <h2>вљ™пёЏ Ota-ona sozlamalari</h2>
+  <label>Yangi ota-ona PIN</label><input id="newParentPin" maxlength="4" inputmode="numeric">
+  <button class="primary" onclick="changeParentPin()">PINni almashtirish</button>
+ </div>
+ <div class="card">
+  <h2>рџ’ѕ MaвЂ™lumotlarni saqlash</h2>
+  <button class="green" onclick="backup()">Backup olish</button>
+  <label class="gray" style="display:inline-block;padding:11px 16px;border-radius:13px;font-weight:700;cursor:pointer">Backup tiklash<input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none"></label>
+ </div>
+ <div class="card dangerZone">
+  <h2>рџ—‘ Tozalash</h2><p class="muted">Barcha maвЂ™lumotlar oвЂchadi.</p>
+  <button class="red" onclick="resetAll()">Barchasini oвЂchirish</button>
+ </div>
+</section>
+
+</section>
+<div class="appBottomSpace"></div></div>
 
 <script>
-
-/* ================================================
-DATABASE
-================================================ */
-
-const DB="BILIM_MUKOFOT_V4";
-
-const today=
-new Date().toISOString().slice(0,10);
-
-let data;
-
-try{
-
- data=JSON.parse(
-  localStorage.getItem(DB)
- );
-
-}catch(e){}
-
-if(!data){
-
- data={
-  children:[],
-  lessons:[],
-  homes:[],
-  earnings:[]
- };
-
-}
-
-let selectedChild=
-localStorage.getItem("SELECTED_CHILD_V4")||null;
-
-
-/* ================================================
-SAQLASH
-================================================ */
-
-function save(){
-
- localStorage.setItem(
-  DB,
-  JSON.stringify(data)
- );
-
-}
-
-
-/* ================================================
-PUL
-================================================ */
-
-function money(n){
-
- return new Intl.NumberFormat(
-  "uz-UZ"
- ).format(n)+" so‘m";
-
-}
-
-
-/* ================================================
-SAHIFA
-================================================ */
-
-function openPage(id,btn){
-
- document.querySelectorAll(".screen")
- .forEach(x=>
-  x.classList.remove("active")
- );
-
- document.getElementById(id)
- .classList.add("active");
-
- document.querySelectorAll(".nav")
- .forEach(x=>
-  x.classList.remove("active")
- );
-
- if(btn)
-  btn.classList.add("active");
-
- refresh();
-
-}
-
-
-/* ================================================
-BOLA YARATISH
-================================================ */
-
-function createChild(){
-
- let name=
- document.getElementById(
-  "childName"
- ).value.trim();
-
- if(!name){
-
-  alert("Bolaning ismini kiriting.");
-
-  return;
- }
-
- let avatar=
- document.getElementById(
-  "childAvatar"
- ).value;
-
- let child={
-
-  id:Date.now().toString(),
-
-  name:name,
-
-  avatar:avatar
-
- };
-
- data.children.push(child);
-
- selectedChild=child.id;
-
- localStorage.setItem(
-  "SELECTED_CHILD_V4",
-  selectedChild
- );
-
- save();
-
- document.getElementById(
-  "childName"
- ).value="";
-
- refresh();
-
- alert("👶 Bola yaratildi!");
-
-}
-
-
-/* ================================================
-BOLA TANLASH
-================================================ */
-
-function selectChild(id){
-
- selectedChild=id;
-
- localStorage.setItem(
-  "SELECTED_CHILD_V4",
-  id
- );
-
- /* yangi sessiya */
- lessonSession=null;
-
- refresh();
-
-}
-
-
-/* ================================================
-BOLALAR RO‘YXATI
-================================================ */
-
-function renderChildren(){
-
- let box=
- document.getElementById(
-  "childrenList"
- );
-
- if(!data.children.length){
-
-  box.innerHTML=`
-
-  <div class="notice">
-
-  Hali bola qo‘shilmagan.
-
-  Ota-ona panelidan bola qo‘shing.
-
-  </div>
-
-  `;
-
-  document.getElementById(
-   "childPanel"
-  ).classList.add("hidden");
-
-  return;
- }
-
-
- if(
-  !selectedChild ||
-  !data.children.some(
-   x=>x.id===selectedChild
-  )
- ){
-
-  selectedChild=
-  data.children[0].id;
-
- }
-
-
- box.innerHTML=
- data.children.map(c=>`
-
- <div class="profile
- ${c.id===selectedChild?"selected":""}"
-
- onclick="selectChild('${c.id}')">
-
- <div class="avatar">
- ${c.avatar}
- </div>
-
- <div>
-
- <h3>${c.name}</h3>
-
- ${
-  c.id===selectedChild
-  ?"✅ Tanlangan"
-  :"Tanlash uchun bosing"
- }
-
- </div>
-
- </div>
-
- `).join("");
-
-
- let c=data.children.find(
-  x=>x.id===selectedChild
- );
-
- if(c){
-
-  document.getElementById(
-   "headerChild"
-  ).textContent=c.name;
-
-  document.getElementById(
-   "childPanel"
-  ).classList.remove("hidden");
-
- }
-
-}
-
-
-/* ================================================
-SELECTLAR
-================================================ */
-
-function fillSelect(id){
-
- let el=
- document.getElementById(id);
-
- if(!el)return;
-
- let old=el.value;
-
- el.innerHTML=
- data.children.map(c=>`
-
- <option value="${c.id}">
- ${c.avatar} ${c.name}
- </option>
-
- `).join("");
-
- if(
-  old &&
-  data.children.some(
-   c=>c.id===old
-  )
- )
- el.value=old;
-
-}
-
-
-/* ================================================
-RANDOM
-================================================ */
-
-function random(a,b){
-
- return Math.floor(
-  Math.random()*(b-a+1)
- )+a;
-
-}
-
-
-/* ================================================
-TOPSHIRIQ YARATISH
-================================================ */
-
-function makeTask(topic){
-
- let q="";
- let answer="";
-
- if(topic==="add10"){
-
-  let a=random(0,9);
-
-  let b=random(0,10-a);
-
-  q=`${a} + ${b} = ?`;
-
-  answer=String(a+b);
-
- }
-
- else if(topic==="sub10"){
-
-  let a=random(1,10);
-
-  let b=random(0,a);
-
-  q=`${a} − ${b} = ?`;
-
-  answer=String(a-b);
-
- }
-
- else if(topic==="compare10"){
-
-  let a=random(0,10);
-
-  let b=random(0,10);
-
-  q=`${a}  □  ${b}`;
-
-  answer=
-   a>b ? ">" :
-   a<b ? "<" : "=";
-
- }
-
- else{
-
-  let type=random(1,4);
-
-  if(type===1){
-
-   let a=random(0,8);
-
-   let b=random(0,10-a);
-
-   q=`${a} + ${b} = ?`;
-
-   answer=String(a+b);
-
-  }
-
-  else if(type===2){
-
-   let a=random(1,10);
-
-   let b=random(0,a);
-
-   q=`${a} − ${b} = ?`;
-
-   answer=String(a-b);
-
-  }
-
-  else if(type===3){
-
-   let a=random(0,10);
-
-   let b=random(0,10);
-
-   q=`${a} □ ${b}`;
-
-   answer=
-    a>b?">":
-    a<b?"<":"=";
-
-  }
-
-  else{
-
-   let a=random(1,5);
-
-   let b=random(1,5);
-
-   q=
-   `Ali ${a} ta olma oldi.
-   Onasi yana ${b} ta berdi.
-   Jami nechta olma bo‘ldi?`;
-
-   answer=String(a+b);
-
-  }
-
- }
-
+const DBKEY="BILIM_USTOZ_V9";
+const today=()=>new Date().toISOString().slice(0,10);
+let data=load();
+let session={role:null,userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
+
+function defaults(){
  return {
-  q:q,
-  answer:answer
+  parentPin:"1234",
+  children:[],
+  assignments:[],
+  homes:[],
+  activity:[],
+  ai:{mode:"local",url:"",lang:"uz"}
  };
-
 }
-
-
-/* ================================================
-BUGUNGI 10 TA TOPSHIRIQ
-================================================ */
-
-function generateToday(){
-
- let child=
- document.getElementById(
-  "autoChild"
- ).value;
-
- let topic=
- document.getElementById(
-  "autoTopic"
- ).value;
-
- let subject=
- document.getElementById(
-  "autoSubject"
- ).value;
-
- let points=parseInt(
-  document.getElementById(
-   "autoPoints"
-  ).value
- )||10;
-
-
- if(!child){
-
-  alert("Avval bola yarating.");
-
-  return;
-
- }
-
-
- /* bir kunda 10 tadan oshirmaymiz */
-
- let existing=data.lessons.filter(
-  x=>
-   x.child===child &&
-   x.date===today
- );
-
- let remaining=
- Math.max(0,10-existing.length);
-
- if(remaining===0){
-
-  alert(
-   "⚠️ Bu bola uchun bugungi 10 ta topshiriq allaqachon berilgan."
-  );
-
-  return;
- }
-
-
- let count=0;
-
- let attempts=0;
-
- while(
-  count<remaining &&
-  attempts<200
- ){
-
-  attempts++;
-
-  let task=
-   makeTask(topic);
-
-  let exists=
-   data.lessons.some(x=>
-
-    x.child===child &&
-    x.date===today &&
-    x.question===task.q
-
-   );
-
-  if(exists)
-   continue;
-
-
-  data.lessons.push({
-
-   id:
-    Date.now().toString()+
-    "_" + Math.random(),
-
-   child:child,
-
-   date:today,
-
-   subject:subject,
-
-   question:task.q,
-
-   answer:task.answer,
-
-   points:points,
-
-   source:"auto",
-
-   done:false,
-
-   result:null
-
-  });
-
-  count++;
-
- }
-
-
- save();
-
-
- document.getElementById(
-  "generatorResult"
- ).innerHTML=`
-
- <p class="success">
-
- ✅ ${count} ta yangi topshiriq yaratildi!
-
- </p>
-
- `;
-
- refresh();
-
+function load(){try{return JSON.parse(localStorage.getItem(DBKEY))||defaults()}catch(e){return defaults()}}
+function save(){localStorage.setItem(DBKEY,JSON.stringify(data))}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function money(n){return new Intl.NumberFormat("uz-UZ").format(Number(n)||0)+" soвЂm"}
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function childById(cid){return data.children.find(x=>x.id===cid)}
+function currentChild(){return childById(session.userId)}
+function statFor(c,sub){c.stats=c.stats||{};c.stats[sub]=c.stats[sub]||{level:1,answered:0,correct:0,streak:0,last:""};return c.stats[sub]}
+function addActivity(cid,type,title,points=0,moneyAmt=0,meta={}){
+ data.activity.push({id:id(),child:cid,type,title,points,money:moneyAmt,date:today(),ts:Date.now(),...meta});save()
 }
-
-
-/* ================================================
-QO‘LDA TOPSHIRIQ
-================================================ */
-
-function addManualLesson(){
-
- let child=
- document.getElementById(
-  "manualChild"
- ).value;
-
- let subject=
- document.getElementById(
-  "manualSubject"
- ).value.trim()
- ||"Umumiy";
-
- let q=
- document.getElementById(
-  "manualQuestion"
- ).value.trim();
-
- let answer=
- document.getElementById(
-  "manualAnswer"
- ).value.trim();
-
- let points=parseInt(
-  document.getElementById(
-   "manualPoints"
-  ).value
- )||10;
-
-
- if(!q||!answer){
-
-  alert(
-   "Topshiriq va to‘g‘ri javobni kiriting."
-  );
-
-  return;
-
- }
-
-
- let todayCount=
- data.lessons.filter(x=>
-
-  x.child===child &&
-  x.date===today
-
- ).length;
-
-
- if(todayCount>=10){
-
-  alert(
-   "⚠️ Bir kunda 10 tadan ortiq dars topshirig‘i berilmaydi."
-  );
-
-  return;
-
- }
-
-
- data.lessons.push({
-
-  id:
-   Date.now().toString(),
-
-  child:child,
-
-  date:today,
-
-  subject:subject,
-
-  question:q,
-
-  answer:answer,
-
-  points:points,
-
-  source:"manual",
-
-  done:false,
-
-  result:null
-
- });
-
-
- save();
-
- document.getElementById(
-  "manualQuestion"
- ).value="";
-
- document.getElementById(
-  "manualAnswer"
- ).value="";
-
- refresh();
-
- alert("📚 Topshiriq berildi!");
-
+function showScreen(idv){
+ document.querySelectorAll("#appScreen .screen").forEach(x=>x.classList.remove("active"));
+ document.getElementById(idv).classList.add("active")
 }
-
-
-/* ================================================
-MUHIM:
-BOLA SAVOL SESSIYASI
-================================================ */
-
-let lessonSession=null;
-
-
-/*
-lessonSession:
-
-{
- list:[],
- index:0,
- correct:0,
- points:0,
- answers:[]
+function activateNav(btn){
+ document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active")); if(btn)btn.classList.add("active")
 }
-
-*/
-
-
-function startLesson(){
-
- if(!selectedChild)
-  return;
-
-
- let list=
- data.lessons.filter(x=>
-
-  x.child===selectedChild &&
-  x.date===today
-
- );
-
-
- /*
- Agar bugungi topshiriqlar tugagan bo‘lsa
- */
-
- if(!list.length){
-
-  document.getElementById(
-   "lessonArea"
-  ).innerHTML=`
-
-  <div class="notice">
-
-  📚 Bugun uchun topshiriq yo‘q.
-
-  Ota-ona topshiriq bersa,
-  shu yerda paydo bo‘ladi.
-
-  </div>
-
-  `;
-
-  return;
-
- }
-
-
- /*
- Bajarilmaganlarini olamiz
- */
-
- let remaining=
- list.filter(x=>!x.done);
-
-
- if(!remaining.length){
-
-  showFinalResult(list);
-
-  return;
-
- }
-
-
- lessonSession={
-
-  list:remaining,
-
-  index:0,
-
-  correct:0,
-
-  points:0,
-
-  answers:[]
-
- };
-
-
- renderCurrentQuestion();
-
+function showParentLogin(){
+ document.getElementById("loginArea").innerHTML=`<h3>рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§ Ota-ona PIN</h3><input id="parentLoginPin" type="password" maxlength="4" placeholder="PIN"><button class="primary" onclick="parentLogin()">Kirish</button><div id="loginErr"></div>`
 }
-
-
-/* ================================================
-JORIY SAVOL
-================================================ */
-
-function renderCurrentQuestion(){
-
- if(!lessonSession)
-  return;
-
-
- let total=
- lessonSession.list.length;
-
- let index=
- lessonSession.index;
-
- let t=
- lessonSession.list[index];
-
-
- let percent=
- (index/total)*100;
-
-
- document.getElementById(
-  "lessonArea"
- ).innerHTML=`
-
- <div class="questionBox">
-
- <div class="questionNumber">
-
- 📚 ${index+1} / ${total}
-
- </div>
-
- <div class="progress">
-
- <div style="width:${percent}%"></div>
-
- </div>
-
- <div class="questionText">
-
- ${t.question}
-
- </div>
-
- <input
-
- id="currentAnswer"
-
- class="answerInput"
-
- autocomplete="off"
-
- placeholder="Javobingiz">
-
- <button
-
- class="primary nextButton"
-
- onclick="nextQuestion()">
-
- ${
-  index===total-1
-  ?"🏁 Tugatish"
-  :"Keyingi ➜"
- }
-
- </button>
-
- </div>
-
- `;
-
-
- document.getElementById(
-  "currentAnswer"
- ).focus();
-
-
- /*
- Enter tugmasi ham Keyingi bo‘lsin
- */
-
- document.getElementById(
-  "currentAnswer"
- ).addEventListener(
-  "keydown",
-  function(e){
-
-   if(e.key==="Enter"){
-
-    e.preventDefault();
-
-    nextQuestion();
-
-   }
-
-  }
- );
-
+function showChildLogin(){
+ let opts=data.children.map(c=>`<option value="${c.id}">${c.avatar} ${esc(c.name)}</option>`).join("");
+ document.getElementById("loginArea").innerHTML=`<h3>рџ§’ Bola kirishi</h3>${opts?`<select id="childLoginSelect">${opts}</select><input id="childLoginPin" type="password" maxlength="4" placeholder="Bola PIN"><button class="green" onclick="childLogin()">Kirish</button>`:`<div class="notice">Avval ota-ona profil yaratishi kerak.</div>`}<div id="loginErr"></div>`
 }
-
-
-/* ================================================
-KEYINGI SAVOL
-================================================ */
-
-function nextQuestion(){
-
- if(!lessonSession)
-  return;
-
-
- let input=
- document.getElementById(
-  "currentAnswer"
- );
-
- if(!input)
-  return;
-
-
- let answer=
- input.value.trim();
-
-
- if(!answer){
-
-  alert(
-   "✏️ Avval javobingizni yozing."
-  );
-
-  input.focus();
-
-  return;
-
- }
-
-
- let t=
- lessonSession.list[
-  lessonSession.index
- ];
-
-
- let correct=
- answer.toLowerCase()===
- t.answer.toLowerCase();
-
-
- /*
- NATIJANI HOZIRCHA EKRANGA
- CHIQARMAYMIZ
- */
-
- lessonSession.answers.push({
-
-  taskId:t.id,
-
-  answer:answer,
-
-  correct:correct
-
- });
-
-
- if(correct){
-
-  lessonSession.correct++;
-
-  lessonSession.points+=
-   Number(t.points)||0;
-
- }
-
-
- lessonSession.index++;
-
-
- if(
-  lessonSession.index>=
-  lessonSession.list.length
- ){
-
-  finishLesson();
-
+function parentLogin(){
+ let p=document.getElementById("parentLoginPin").value;
+ if(p!==data.parentPin){document.getElementById("loginErr").innerHTML='<p class="error">PIN notoвЂgвЂri</p>';return}
+ session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
+}
+function childLogin(){
+ let cid=document.getElementById("childLoginSelect").value,p=document.getElementById("childLoginPin").value,c=childById(cid);
+ if(!c||p!==c.pin){document.getElementById("loginErr").innerHTML='<p class="error">PIN notoвЂgвЂri</p>';return}
+ session={role:"child",userId:cid,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
+}
+function logout(){
+ session={role:null,userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
+ document.getElementById("appScreen").classList.remove("active");document.getElementById("loginScreen").classList.add("active");document.getElementById("loginArea").innerHTML=""
+}
+function openApp(){
+ document.getElementById("loginScreen").classList.remove("active");document.getElementById("appScreen").classList.add("active");
+ let nav=document.getElementById("mainNav");
+ if(session.role==="parent"){
+  document.getElementById("headerUser").textContent="рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§ Ota-ona";
+  nav.innerHTML=`
+   <button class="nav active" onclick="activateNav(this);showScreen('parentDash');refreshParent()">рџ“Љ Bosh sahifa</button>
+   <button class="nav" onclick="activateNav(this);showScreen('parentChildren');refreshParent()">рџ‘¶ Bolalar</button>
+   <button class="nav" onclick="activateNav(this);showScreen('parentAssign');refreshParent()">рџ“ќ Topshiriq</button>
+   <button class="nav" onclick="activateNav(this);showScreen('parentHome');refreshParent()">рџЏ  Uy ishi</button>
+   <button class="nav" onclick="activateNav(this);showScreen('parentAI');refreshParent()">рџ¤– AI</button>
+   <button class="nav" onclick="activateNav(this);showScreen('parentSettings');refreshParent()">вљ™пёЏ Sozlama</button>`;
+  showScreen("parentDash");refreshParent()
  }else{
-
-  renderCurrentQuestion();
-
+  let c=currentChild();document.getElementById("headerUser").textContent=`${c.avatar} ${c.name}`;
+  nav.innerHTML=`
+   <button class="nav active" onclick="activateNav(this);showScreen('childHome');refreshChild()">рџЏ  Bosh sahifa</button>
+   <button class="nav" onclick="activateNav(this);showScreen('games')">рџЋ® OвЂyinlar</button>
+   <button class="nav" onclick="activateNav(this);showScreen('childStats');refreshChild()">рџ“Љ Natija</button>`;
+  showScreen("childHome");refreshChild()
  }
-
 }
 
+function saveChild(){
+ let name=childName.value.trim(),pin=childPin.value.trim();
+ if(!name||!/^\d{4}$/.test(pin)){alert("Ism va 4 raqamli PIN kiriting.");return}
+ data.children.push({id:id(),name,avatar:childAvatar.value,grade:Number(childGrade.value),pin,pointRate:Number(pointRate.value)||100,note:childNote.value.trim(),stats:{},created:Date.now()});
+ save();childName.value="";childPin.value="";childNote.value="";refreshParent()
+}
+function editChild(cid){
+ let c=childById(cid); if(!c)return;
+ let name=prompt("Ism",c.name); if(name===null)return;
+ let pin=prompt("4 raqamli PIN",c.pin); if(pin===null)return;
+ if(!/^\d{4}$/.test(pin)){alert("PIN 4 raqam boвЂlsin.");return}
+ let grade=prompt("Sinf (1-11)",c.grade); if(grade===null)return;
+ c.name=name.trim()||c.name;c.pin=pin;c.grade=Math.max(1,Math.min(11,Number(grade)||c.grade));save();refreshParent()
+}
+function deleteChild(cid){
+ if(!confirm("Bu bolani oвЂchirasizmi?"))return;
+ data.children=data.children.filter(x=>x.id!==cid);data.assignments=data.assignments.filter(x=>x.child!==cid);data.homes=data.homes.filter(x=>x.child!==cid);save();refreshParent()
+}
+function fillSelect(idv){
+ let e=document.getElementById(idv);if(!e)return;let old=e.value;
+ e.innerHTML=data.children.map(c=>`<option value="${c.id}">${c.avatar} ${esc(c.name)}</option>`).join("");if([...e.options].some(o=>o.value===old))e.value=old
+}
 
-/* ================================================
-10 TA TUGAGACH
-================================================ */
+function addAssignment(){
+ let child=assignChild.value;if(!child){alert("Bola tanlang.");return}
+ data.assignments.push({id:id(),child,type:assignType.value,subject:assignSubject.value,topic:assignTopic.value.trim()||"Avtomatik mavzu",count:Number(assignCount.value)||0,bonus:Number(assignBonus.value)||0,note:assignNote.value.trim(),status:"waiting",created:Date.now()});
+ save();assignTopic.value="";assignNote.value="";refreshParent()
+}
+async function generateAIAssignment(){
+ let cid=assignChild.value,c=childById(cid);if(!c){alert("Bola tanlang.");return}
+ let prompt=`${c.grade}-sinf ${c.name} uchun ${subjectName(assignSubject.value)} fanidan "${assignTopic.value||"mos mavzu"}" boвЂyicha qiziqarli topshiriq yarat.`;
+ document.getElementById("assignResult").innerHTML='<p class="muted">Yaratilmoqda...</p>';
+ let out=await aiGenerate(prompt,c,assignSubject.value);
+ assignNote.value=out.text||out;
+ document.getElementById("assignResult").innerHTML='<p class="success">AI taklif tayyorladi. Xohlasangiz tahrirlab вЂњTopshiriq berishвЂќni bosing.</p>'
+}
 
-function finishLesson(){
+function addHome(){
+ let cid=homeChild.value,title=homeTitle.value.trim(),reward=Number(homeReward.value)||0;if(!cid||!title||reward<=0){alert("ToвЂliq kiriting.");return}
+ data.homes.push({id:id(),child:cid,title,reward,repeat:homeRepeat.checked,date:today(),status:"waiting"});save();homeTitle.value="";refreshParent()
+}
+function claimHome(hid){let h=data.homes.find(x=>x.id===hid);if(h){h.status="claimed";save();refreshChild()}}
+function approveHome(hid,part=1){
+ let h=data.homes.find(x=>x.id===hid);if(!h)return;h.status="approved";let amt=Math.floor(h.reward*part);
+ addActivity(h.child,"home",h.title,0,amt);save();refreshParent()
+}
+function rejectHome(hid){let h=data.homes.find(x=>x.id===hid);if(h){h.status="rejected";save();refreshParent()}}
 
- if(!lessonSession)
-  return;
-
-
- /*
- Natijalarni databasega yozamiz
- */
-
- lessonSession.answers.forEach(a=>{
-
-  let t=data.lessons.find(
-   x=>x.id===a.taskId
-  );
-
-  if(!t)return;
-
-  t.done=true;
-
-  t.result=
-   a.correct
-   ?"correct"
-   :"wrong";
-
+function refreshParent(){
+ pChildren.textContent=data.children.length;pAnswers.textContent=data.activity.filter(a=>a.type==="answer").length;
+ pPoints.textContent=data.activity.reduce((s,a)=>s+(a.points||0),0);pMoney.textContent=money(data.activity.reduce((s,a)=>s+(a.money||0),0));
+ recentActivity.innerHTML=data.activity.slice(-12).reverse().map(a=>{let c=childById(a.child);return `<div class="task"><b>${c?.avatar||"рџ§’"} ${esc(c?.name||"Bola")}</b> вЂ” ${esc(a.title)} <span class="pill">${a.date}</span></div>`}).join("")||'<div class="notice">Hali faoliyat yoвЂq.</div>';
+ parentAnalysis.innerHTML=data.children.map(c=>{
+   let vals=subjectsForGrade(c.grade).map(s=>{let st=statFor(c,s);return {s,p:st.answered?Math.round(st.correct/st.answered*100):null,a:st.answered}}).filter(x=>x.a>=3).sort((a,b)=>a.p-b.p);
+   if(!vals.length)return `<div class="task"><b>${c.avatar} ${esc(c.name)}</b> вЂ” hali tahlil uchun yetarli natija yoвЂq.</div>`;
+   let w=vals[0],best=vals[vals.length-1];
+   return `<div class="task"><b>${c.avatar} ${esc(c.name)}</b><p>Takrorlash: <b>${subjectName(w.s)} ${w.p}%</b> вЂў Kuchli: <b>${subjectName(best.s)} ${best.p}%</b></p></div>`;
+ }).join("")||'<div class="notice">Bola qoвЂshilmagan.</div>';
+ childrenManage.innerHTML=data.children.map(c=>`<div class="profile"><div class="avatar">${c.avatar}</div><div class="info"><b>${esc(c.name)}</b><div class="muted">${c.grade}-sinf вЂў PIN: ${esc(c.pin)} вЂў 1 ball = ${money(c.pointRate)}</div><div class="small">${esc(c.note||"")}</div></div><button class="gray" onclick="editChild('${c.id}')">Tahrirlash</button><button class="red" onclick="deleteChild('${c.id}')">OвЂchirish</button></div>`).join("")||'<div class="notice">Bola qoвЂshilmagan.</div>';
+ ["assignChild","homeChild","aiChild"].forEach(fillSelect);
+ assignmentList.innerHTML=data.assignments.slice().reverse().map(a=>{let c=childById(a.child);return `<div class="task"><b>${c?.avatar||"рџ§’"} ${esc(c?.name||"")}</b> вЂў ${subjectName(a.subject)} вЂў ${esc(a.topic)} <span class="pill">${a.status}</span><p>${esc(a.note||"")}</p></div>`}).join("")||'<div class="notice">Topshiriqlar yoвЂq.</div>';
+ pendingHomes.innerHTML=data.homes.filter(h=>h.status==="claimed").map(h=>{let c=childById(h.child);return `<div class="task"><b>${c?.avatar||"рџ§’"} ${esc(c?.name||"")}</b><p>рџЏ  ${esc(h.title)} вЂ” ${money(h.reward)}</p><button class="green" onclick="approveHome('${h.id}',1)">ToвЂliq</button> <button class="orange" onclick="approveHome('${h.id}',.5)">Qisman</button> <button class="red" onclick="rejectHome('${h.id}')">Rad</button></div>`}).join("")||'<div class="notice">Tasdiqlanadigan ish yoвЂq.</div>';
+ aiMode.value=data.ai.mode;aiUrl.value=data.ai.url;aiLang.value=data.ai.lang
+}
+function refreshChild(){
+ let c=currentChild();if(!c)return;renderSubjectGrid();let acts=data.activity.filter(a=>a.child===c.id);
+ cPoints.textContent=acts.reduce((s,a)=>s+(a.points||0),0);cMoney.textContent=money(acts.reduce((s,a)=>s+(a.money||0),0));
+ let dates=[...new Set(acts.map(a=>a.date))].sort();cStreak.textContent=calcStreak(dates);cDone.textContent=acts.filter(a=>a.type==="answer"||a.type==="home").length;
+ childAssignments.innerHTML=data.assignments.filter(a=>a.child===c.id&&a.status!=="done").map(a=>`<div class="task"><b>${subjectName(a.subject)} вЂ” ${esc(a.topic)}</b><p>${esc(a.note||"")}</p><button class="primary" onclick="startAssignment('${a.id}')">Boshlash</button></div>`).join("")||'<div class="notice">Yangi topshiriq yoвЂq.</div>';
+ childHomes.innerHTML=data.homes.filter(h=>h.child===c.id&&(h.date===today()||h.repeat)).map(h=>`<div class="task"><b>рџЏ  ${esc(h.title)}</b><p class="success">${money(h.reward)}</p>${h.status==="waiting"?`<button class="green" onclick="claimHome('${h.id}')">Bajardim</button>`:`<span class="badge">${h.status==="claimed"?"вЏі Tasdiq kutilmoqda":h.status==="approved"?"вњ… Tasdiqlandi":"вќЊ Rad"}</span>`}</div>`).join("")||'<div class="notice">Bugun uy ishi yoвЂq.</div>';
+ renderDailyRecommendation();
+ renderChildStats()
+}
+function renderDailyRecommendation(){
+ let c=currentChild(),box=document.getElementById("dailyRecommendation");if(!c||!box)return;
+ let subs=subjectsForGrade(c.grade),scores=subs.map(s=>{
+   let st=statFor(c,s),pct=st.answered?Math.round(st.correct/st.answered*100):null;
+   return {s,st,pct};
  });
-
-
- /*
- To‘g‘ri javoblar uchun pul
- */
-
- let earningPoints=
-  lessonSession.points;
-
-
- let earningMoney=
-  earningPoints*100;
-
-
- if(earningPoints>0){
-
-  data.earnings.push({
-
-   id:Date.now().toString(),
-
-   child:selectedChild,
-
-   type:"lesson",
-
-   amount:earningMoney,
-
-   points:earningPoints,
-
-   title:"Bugungi dars",
-
-   date:today
-
-  });
-
+ let weak=scores.filter(x=>x.st.answered>=3).sort((a,b)=>(a.pct??100)-(b.pct??100))[0];
+ if(weak&&weak.pct<75){
+   box.innerHTML=`рџ“Њ Bugun <b>${subjectName(weak.s)}</b> fanidan 5вЂ“10 daqiqa mashq tavsiya qilaman. Hozirgi natija: <b>${weak.pct}%</b>. <button class="primary" onclick="openLearn('${weak.s}')">Boshlash</button>`;
+ }else{
+   let next=scores.sort((a,b)=>a.st.answered-b.st.answered)[0];
+   box.innerHTML=`рџЊџ Bugun <b>${subjectName(next.s)}</b> fanidan yangi mashq qilib koвЂring. <button class="green" onclick="openLearn('${next.s}')">Boshlash</button>`;
  }
-
-
- save();
-
-
- showFinalResult(
-  data.lessons.filter(x=>
-   x.child===selectedChild &&
-   x.date===today
-  )
- );
-
-
- lessonSession=null;
-
- refreshStatsOnly();
-
 }
 
-
-/* ================================================
-YAKUNIY NATIJA
-================================================ */
-
-function showFinalResult(list){
-
- let correct=
-  list.filter(
-   x=>x.result==="correct"
-  ).length;
-
-
- let total=list.length;
-
-
- let points=
-  list
-  .filter(x=>x.result==="correct")
-  .reduce(
-   (s,x)=>s+(Number(x.points)||0),
-   0
-  );
-
-
- /*
- Bugungi dars uchun avval berilgan
- earningni olish
- */
-
- let lessonEarn=
-  data.earnings
-  .filter(x=>
-   x.child===selectedChild &&
-   x.date===today &&
-   x.type==="lesson"
-  )
-  .reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- document.getElementById(
-  "lessonArea"
- ).innerHTML=`
-
- <div class="bigResult">
-
- <div style="font-size:55px">
- 🎉
- </div>
-
- <h2>
- Bugungi topshiriqlar tugadi!
- </h2>
-
- <div class="resultNumber">
-
- ${correct} / ${total}
-
- </div>
-
- <p>
- To‘g‘ri javoblar
- </p>
-
- <div class="starResult">
-
- ⭐ ${points} ball
-
- </div>
-
- <div class="moneyResult">
-
- 💰 ${money(lessonEarn)}
-
- </div>
-
- ${
-  correct===total
-
-  ?
-
-  `<p class="success">
-  🏆 Ajoyib! Hammasini to‘g‘ri bajardingiz!
-  </p>`
-
-  :
-
-  correct>=total/2
-
-  ?
-
-  `<p>
-  👍 Juda yaxshi!
-  Yana mashq qilsangiz yanada yaxshi bo‘ladi.
-  </p>`
-
-  :
-
-  `<p>
-  💪 Harakat qilishda davom eting!
-  </p>`
-
- }
-
- </div>
-
- `;
-
-}
-
-
-/* ================================================
-UY ISHI
-================================================ */
-
-function addHomeWork(){
-
- let child=
- document.getElementById(
-  "homeChild"
- ).value;
-
- let title=
- document.getElementById(
-  "homeTitle"
- ).value.trim();
-
- let reward=parseInt(
-  document.getElementById(
-   "homeReward"
-  ).value
- )||0;
-
- let repeat=
- document.getElementById(
-  "dailyRepeat"
- ).checked;
-
-
- if(!title||reward<=0){
-
-  alert(
-   "Uy ishini to‘liq kiriting."
-  );
-
-  return;
-
- }
-
-
- data.homes.push({
-
-  id:Date.now().toString(),
-
-  child:child,
-
-  title:title,
-
-  reward:reward,
-
-  repeat:repeat,
-
-  date:today,
-
-  status:"waiting"
-
- });
-
-
- save();
-
- document.getElementById(
-  "homeTitle"
- ).value="";
-
- refresh();
-
- alert(
-  repeat
-  ?"🔄 Har kuni bajariladigan ish qo‘shildi!"
-  :"🏠 Bugungi ish qo‘shildi!"
- );
-
-}
-
-
-/* ================================================
-UY ISHLARI
-================================================ */
-
-function renderHome(){
-
- let box=
- document.getElementById(
-  "homeList"
- );
-
- if(!selectedChild){
-
-  box.innerHTML="";
-
-  return;
-
- }
-
-
- let list=
- data.homes.filter(x=>
-
-  x.child===selectedChild &&
-  (
-   x.date===today ||
-   x.repeat
-  )
-
- );
-
-
- if(!list.length){
-
-  box.innerHTML=`
-
-  <div class="notice">
-
-  Bugun uy ishi yo‘q.
-
-  </div>
-
-  `;
-
-  return;
-
- }
-
-
- box.innerHTML=
- list.map(t=>`
-
- <div class="task">
-
- <h3>
- 🏠 ${t.title}
- </h3>
-
- <p class="reward">
- 💰 ${money(t.reward)}
- </p>
-
- ${
-  t.status==="waiting"
-
-  ?
-
-  `<button
-   class="green"
-   onclick="claimHome('${t.id}')">
-
-   ✅ Bajardim
-
-   </button>`
-
-  :
-
-  t.status==="claimed"
-
-  ?
-
-  `<span class="badge">
-   ⏳ Ota-ona tasdig‘i kutilmoqda
-   </span>`
-
-  :
-
-  t.status==="approved"
-
-  ?
-
-  `<span class="badge">
-   💰 Tasdiqlandi
-   </span>`
-
-  :
-
-  `<span class="badge">
-   ❌ Rad etildi
-   </span>`
-
- }
-
- </div>
-
- `).join("");
-
-}
-
-
-/* ================================================
-UY ISHINI BAJARDIM
-================================================ */
-
-function claimHome(id){
-
- let t=data.homes.find(
-  x=>x.id===id
- );
-
- if(!t)return;
-
- t.status="claimed";
-
- save();
-
- refresh();
-
- alert(
-  "👍 Ota-onaga yuborildi!"
- );
-
-}
-
-
-/* ================================================
-OTA ONA TASDIQLASH
-================================================ */
-
-function renderPending(){
-
- let box=
- document.getElementById(
-  "pending"
- );
-
- let list=
- data.homes.filter(
-  x=>x.status==="claimed"
- );
-
-
- if(!list.length){
-
-  box.innerHTML=`
-
-  <div class="notice">
-  Tasdiqlanadigan ish yo‘q.
-  </div>
-
-  `;
-
-  return;
-
- }
-
-
- box.innerHTML=
- list.map(t=>{
-
-  let c=
-   data.children.find(
-    x=>x.id===t.child
-   );
-
-  return `
-
-  <div class="task">
-
-  <h3>
-  ${c?.avatar||"👦"}
-  ${c?.name||"Bola"}
-  </h3>
-
-  <p>
-  🏠 ${t.title}
-  </p>
-
-  <p class="reward">
-  💰 ${money(t.reward)}
-  </p>
-
-  <button
-  class="green"
-  onclick="approveHome('${t.id}')">
-
-  ✅ To‘liq
-
-  </button>
-
-  <button
-  class="orange"
-  onclick="partialHome('${t.id}')">
-
-  🟡 Qisman
-
-  </button>
-
-  <button
-  class="red"
-  onclick="rejectHome('${t.id}')">
-
-  ❌ Rad etish
-
-  </button>
-
-  </div>
-
-  `;
-
- }).join("");
-
-}
-
-
-/* ================================================
-UY ISHI TASDIQ
-================================================ */
-
-function approveHome(id){
-
- let t=
-  data.homes.find(
-   x=>x.id===id
-  );
-
- if(!t)return;
-
- t.status="approved";
-
- addEarning(
-  t.child,
-  "home",
-  t.reward,
-  0,
-  t.title
- );
-
- save();
-
- refresh();
-
-}
-
-
-function partialHome(id){
-
- let t=
-  data.homes.find(
-   x=>x.id===id
-  );
-
- if(!t)return;
-
- t.status="approved";
-
- let amount=
-  Math.floor(t.reward/2);
-
- addEarning(
-  t.child,
-  "home",
-  amount,
-  0,
-  t.title+" (qisman)"
- );
-
- save();
-
- refresh();
-
-}
-
-
-function rejectHome(id){
-
- let t=
-  data.homes.find(
-   x=>x.id===id
-  );
-
- if(!t)return;
-
- t.status="rejected";
-
- save();
-
- refresh();
-
-}
-
-
-/* ================================================
-DAROMAD
-================================================ */
-
-function addEarning(
- child,
- type,
- amount,
- points,
- title
-){
-
- data.earnings.push({
-
-  id:Date.now().toString(),
-
-  child:child,
-
-  type:type,
-
-  amount:amount,
-
-  points:points,
-
-  title:title,
-
-  date:today
-
- });
-
-}
-
-
-/* ================================================
-BOLA STATISTIKA
-================================================ */
-
+function calcStreak(dates){let s=0,d=new Date();for(let i=0;i<365;i++){let k=d.toISOString().slice(0,10);if(dates.includes(k))s++;else if(i>0)break;d.setDate(d.getDate()-1)}return s}
 function renderChildStats(){
-
- if(!selectedChild)return;
-
- let todayE=
-  data.earnings.filter(
-   x=>
-    x.child===selectedChild &&
-    x.date===today
-  );
-
-
- let total=
-  todayE.reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- let points=
-  todayE.reduce(
-   (s,x)=>s+(x.points||0),
-   0
-  );
-
-
- let balance=
-  data.earnings
-  .filter(
-   x=>x.child===selectedChild
-  )
-  .reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- document.getElementById(
-  "todayPoints"
- ).textContent=points;
-
-
- document.getElementById(
-  "todayMoney"
- ).textContent=
-  money(total);
-
-
- document.getElementById(
-  "balance"
- ).textContent=
-  money(balance);
-
-
- document.getElementById(
-  "homeCount"
- ).textContent=
-  data.homes.filter(x=>
-   x.child===selectedChild &&
-   (
-    x.repeat ||
-    x.date===today
-   )
-  ).length;
-
-}
-
-
-/* ================================================
-OTA ONA TOPSHIRIQLARI
-================================================ */
-
-function renderParentLessons(){
-
- let box=
-  document.getElementById(
-   "parentLessons"
-  );
-
- let list=
-  data.lessons.filter(
-   x=>x.date===today
-  );
-
-
- if(!list.length){
-
-  box.innerHTML=`
-
-  <div class="notice">
-  Bugun topshiriqlar yo‘q.
-  </div>
-
-  `;
-
-  return;
-
- }
-
-
- box.innerHTML=
- list.map(t=>{
-
-  let c=
-   data.children.find(
-    x=>x.id===t.child
-   );
-
-  return `
-
-  <div class="task">
-
-  <b>
-  ${c?.avatar||"👦"}
-  ${c?.name||"Bola"}
-  </b>
-
-  <p>
-  📚 ${t.subject}
-  </p>
-
-  <p>
-  ${t.question}
-  </p>
-
-  <span class="badge">
-  ⭐ ${t.points} ball
-  </span>
-
-  ${
-   t.done
-
-   ?
-
-   `<span class="badge">
-
-   ${
-    t.result==="correct"
-    ?"✅ To‘g‘ri"
-    :"❌ Noto‘g‘ri"
-   }
-
-   </span>`
-
-   :
-
-   `<span class="badge">
-   ⏳ Bajarilmagan
-   </span>`
-
-  }
-
-  </div>
-
-  `;
-
+ let c=currentChild();if(!c)return;
+ let rows=subjectsForGrade(c.grade).map(s=>{
+   let st=statFor(c,s),pct=st.answered?Math.round(st.correct/st.answered*100):0;
+   let state=st.answered<3?"Yangi":pct>=85?"Kuchli":pct>=65?"OвЂrtacha":"Takrorlash kerak";
+   return `<div class="task"><b>${subjectName(s)}</b><div>Daraja: <b>${st.level}</b> вЂў Savollar: ${st.answered} вЂў ToвЂgвЂri: ${st.correct} вЂў ${pct}% вЂў <span class="pill">${state}</span></div><div class="progress"><div style="width:${pct}%"></div></div></div>`;
  }).join("");
-
+ childStatsBox.innerHTML=rows
+}
+const SUBJECTS={
+ math:{name:"рџ§® Matematika",icon:"рџ§®",min:1,max:11},
+ uzbek:{name:"рџ“– Ona tili",icon:"рџ“–",min:1,max:11},
+ reading:{name:"рџ“љ OвЂqish",icon:"рџ“љ",min:1,max:4},
+ writing:{name:"вњЌпёЏ Husnixat",icon:"вњЌпёЏ",min:1,max:4},
+ english:{name:"рџ‡¬рџ‡§ Ingliz tili",icon:"рџ‡¬рџ‡§",min:1,max:11},
+ russian:{name:"рџ‡·рџ‡є Rus tili",icon:"рџ‡·рџ‡є",min:2,max:11},
+ literature:{name:"рџ“• Adabiyot",icon:"рџ“•",min:5,max:11},
+ history:{name:"рџЏ› Tarix",icon:"рџЏ›",min:5,max:11},
+ geography:{name:"рџЊЌ Geografiya",icon:"рџЊЌ",min:5,max:11},
+ biology:{name:"рџЊї Biologiya",icon:"рџЊї",min:5,max:11},
+ physics:{name:"вљ›пёЏ Fizika",icon:"вљ›пёЏ",min:6,max:11},
+ chemistry:{name:"рџ§Є Kimyo",icon:"рџ§Є",min:7,max:11},
+ informatics:{name:"рџ’» Informatika",icon:"рџ’»",min:5,max:11},
+ logic:{name:"рџ§  Mantiq",icon:"рџ§ ",min:1,max:11}
+};
+function subjectsForGrade(g){
+ return Object.keys(SUBJECTS).filter(k=>g>=SUBJECTS[k].min&&g<=SUBJECTS[k].max);
+}
+function subjectName(s){return SUBJECTS[s]?.name||s}
+function renderSubjectGrid(){
+ let c=currentChild(),box=document.getElementById("subjectGrid");if(!c||!box)return;
+ box.innerHTML=subjectsForGrade(c.grade).map(k=>`<div class="subject" onclick="openLearn('${k}')"><span>${SUBJECTS[k].icon}</span>${SUBJECTS[k].name.replace(/^\\S+\\s/,"")}</div>`).join("");
 }
 
-
-/* ================================================
-STATISTIKA
-================================================ */
-
-function renderStats(){
-
- let all=
-  data.earnings.reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- let lesson=
-  data.earnings
-  .filter(x=>x.type==="lesson")
-  .reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- let home=
-  data.earnings
-  .filter(x=>x.type==="home")
-  .reduce(
-   (s,x)=>s+x.amount,
-   0
-  );
-
-
- let points=
-  data.earnings.reduce(
-   (s,x)=>s+(x.points||0),
-   0
-  );
-
-
- document.getElementById(
-  "allPoints"
- ).textContent=points;
-
-
- document.getElementById(
-  "allMoney"
- ).textContent=money(all);
-
-
- document.getElementById(
-  "lessonMoney"
- ).textContent=money(lesson);
-
-
- document.getElementById(
-  "homeMoney"
- ).textContent=money(home);
-
-
- document.getElementById(
-  "childrenStats"
- ).innerHTML=
-
- data.children.map(c=>{
-
-  let total=
-   data.earnings
-   .filter(
-    x=>x.child===c.id
-   )
-   .reduce(
-    (s,x)=>s+x.amount,
-    0
-   );
-
-
-  let pts=
-   data.earnings
-   .filter(
-    x=>x.child===c.id
-   )
-   .reduce(
-    (s,x)=>s+(x.points||0),
-    0
-   );
-
-
-  return `
-
-  <div class="task">
-
-  <h3>
-  ${c.avatar} ${c.name}
-  </h3>
-
-  <p>
-  ⭐ Ball:
-  <b>${pts}</b>
-  </p>
-
-  <p>
-  💰 Jamg‘arma:
-  <b>${money(total)}</b>
-  </p>
-
-  </div>
-
-  `;
-
- }).join("");
-
+function openLearn(s){
+ session.subject=s;showScreen("learn");document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));
+ let c=currentChild(),st=statFor(c,s);learnTitle.textContent=subjectName(s);levelInfo.textContent=`Hozirgi daraja: ${st.level} вЂў Limit yoвЂq вЂ” xohlagancha davom eting.`;
+ renderLanguageRoadmap();
+ showLessonIntro()
 }
 
+const ENGLISH_PATH=[
+ "рџ”¤ Harflar AвЂ“Z va tovushlar",
+ "рџ‘‹ Salomlashish: Hello, Hi, Bye",
+ "рџ”ў 1вЂ“10 sonlar",
+ "рџЋЁ Ranglar",
+ "рџђ¶ Hayvonlar",
+ "рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§ Oila",
+ "рџЏ« Maktab buyumlari",
+ "рџЌЋ Oziq-ovqat",
+ "рџ—Ј I am / You are",
+ "вќ“ What / Who / Where",
+ "рџ“– Sodda gaplarni oвЂqish",
+ "рџЏ† BoshlangвЂich test"
+];
+const RUSSIAN_PATH=[
+ "рџ”¤ РђвЂ“РЇ alifbosi va tovushlar",
+ "рџ‘‹ РџСЂРёРІРµС‚ / РџРѕРєР° / РЎРїР°СЃРёР±Рѕ",
+ "рџ”ў 1вЂ“10 sonlar",
+ "рџЋЁ Ranglar",
+ "рџђ¶ Hayvonlar",
+ "рџ‘ЁвЂЌрџ‘©вЂЌрџ‘§ Oila",
+ "рџЏ« Maktab buyumlari",
+ "рџЌЋ Oziq-ovqat",
+ "рџ—Ј РЇ / РўС‹ / РћРЅ / РћРЅР°",
+ "вќ“ РљС‚Рѕ / Р§С‚Рѕ / Р“РґРµ",
+ "рџ“– Sodda gaplarni oвЂqish",
+ "рџЏ† BoshlangвЂich test"
+];
+function renderLanguageRoadmap(){
+ let card=document.getElementById("languageRoadmapCard"),box=document.getElementById("languageRoadmap");
+ if(!card||!box)return;
+ if(!["english","russian"].includes(session.subject)){card.classList.add("hidden");return}
+ card.classList.remove("hidden");
+ let c=currentChild(),st=statFor(c,session.subject),path=session.subject==="english"?ENGLISH_PATH:RUSSIAN_PATH;
+ let current=Math.min(path.length-1,Math.max(0,st.level-1));
+ box.innerHTML=path.map((x,i)=>`<div class="task" style="${i===current?'border-color:#1769aa;background:#f1f8ff':''}">
+  <b>${i<current?'вњ…':i===current?'в–¶пёЏ':'рџ”’'} ${x}</b>
+  ${i===current?'<div class="muted">Hozir shu bosqich oвЂrganilmoqda.</div>':''}
+ </div>`).join("");
+}
 
-/* ================================================
-LOGIN
-================================================ */
+function showLessonIntro(){
+ let s=session.subject,c=currentChild(),st=statFor(c,s);
+ learningArea.innerHTML=`<div class="lessonBox"><h2>${subjectName(s)}</h2><p class="lessonText">${lessonText(s,st.level,c.grade)}</p>${s==="english"?'<button class="gray" onclick="speakCurrentLesson()">рџ”Љ Eshitish</button>':""}<div class="sep"></div><div class="center"><button class="primary" onclick="startMode('lesson')">рџ“– Darsni oвЂrganish</button> <button class="green" onclick="startMode('practice')">вњЏпёЏ Mashq boshlash</button> <button class="orange" onclick="startMode('test')">рџ“ќ Test</button></div></div>`
+}
+function lessonText(s,l,g){
+ if(s==="math")return g<=4?"Sonlar, amallar va masalalarni bosqichma-bosqich oвЂrganamiz.":"Algebra, geometriya va mantiqiy masalalarni darajangizga mos mashq qilamiz.";
+ if(s==="uzbek")return g<=4?"Harf, boвЂgвЂin, soвЂz, gap va imloni oвЂrganamiz.":"Imlo, grammatika, gap tuzilishi va matn tahlilini mashq qilamiz.";
+ if(s==="reading")return "Matnni ravon oвЂqish, mazmunini tushunish va savollarga javob berishni mashq qilamiz.";
+ if(s==="writing")return "Harf va soвЂzlarni chiroyli, bir xil balandlikda va toвЂgвЂri ulab yozishni mashq qilamiz.";
+ if(s==="english")return englishLessonText(l);
+ if(s==="russian")return russianLessonText(l);
+ if(s==="literature")return "Asar, muallif, qahramon, gвЂoya va matn tahliliga oid topshiriqlar.";
+ if(s==="history")return "Tarixiy voqealar, sanalar, shaxslar va sabab-oqibat bogвЂlanishlarini oвЂrganamiz.";
+ if(s==="geography")return "Davlatlar, xarita, tabiat zonalari, materiklar va geografik tushunchalar.";
+ if(s==="biology")return "Tirik organizmlar, hujayra, oвЂsimlik, hayvon va inson biologiyasi.";
+ if(s==="physics")return "Fizik kattaliklar, formulalar va masalalarni bosqichma-bosqich oвЂrganamiz.";
+ if(s==="chemistry")return "Elementlar, moddalar, formulalar va reaksiyalar boвЂyicha mashqlar.";
+ if(s==="informatics")return "Algoritm, axborot, kompyuter savodxonligi va dasturlash mantiqi.";
+ return "Mantiqiy topshiriqlar diqqat, ketma-ketlik va tez fikrlashni rivojlantiradi."
+}
 
-function loginParent(){
+function englishLessonText(l){
+ const lessons=[
+  "0 dan boshlaymiz: A, B, C harflari va ularning tovushlarini eshitamiz.",
+  "Hello, Hi, Bye kabi eng birinchi soвЂzlarni oвЂrganamiz.",
+  "One, two, three... 1 dan 10 gacha sanashni oвЂrganamiz.",
+  "Red, blue, green kabi ranglarni oвЂrganamiz.",
+  "Cat, dog, bird kabi hayvon nomlarini oвЂrganamiz.",
+  "Mother, father, sister, brother kabi oila soвЂzlari.",
+  "Book, pen, school, bag kabi maktab soвЂzlari.",
+  "Apple, bread, water kabi oziq-ovqat soвЂzlari.",
+  "I am..., You are... bilan sodda gaplar tuzamiz.",
+  "What? Who? Where? savollarini tushunamiz.",
+  "Sodda gaplarni oвЂqish va tushunish.",
+  "BoshlangвЂich daraja yakuniy testi."
+ ];
+ return lessons[Math.min(lessons.length-1,Math.max(0,l-1))];
+}
+function russianLessonText(l){
+ const lessons=[
+  "0 dan boshlaymiz: Рђ, Р‘, Р’ harflari va tovushlarini oвЂrganamiz.",
+  "РџСЂРёРІРµС‚, РџРѕРєР°, РЎРїР°СЃРёР±Рѕ kabi eng birinchi soвЂzlarni oвЂrganamiz.",
+  "РћРґРёРЅ, РґРІР°, С‚СЂРё... 1 dan 10 gacha sanash.",
+  "РљСЂР°СЃРЅС‹Р№, СЃРёРЅРёР№, Р·РµР»С‘РЅС‹Р№ kabi ranglar.",
+  "РљРѕС‚, СЃРѕР±Р°РєР°, РїС‚РёС†Р° kabi hayvon nomlari.",
+  "РњР°РјР°, РїР°РїР°, СЃРµСЃС‚СЂР°, Р±СЂР°С‚ kabi oila soвЂzlari.",
+  "РљРЅРёРіР°, СЂСѓС‡РєР°, С€РєРѕР»Р°, РїРѕСЂС‚С„РµР»СЊ kabi maktab soвЂzlari.",
+  "РЇР±Р»РѕРєРѕ, С…Р»РµР±, РІРѕРґР° kabi oziq-ovqat soвЂzlari.",
+  "РЇ, РўС‹, РћРЅ, РћРЅР° bilan sodda gaplar.",
+  "РљС‚Рѕ? Р§С‚Рѕ? Р“РґРµ? savollarini tushunish.",
+  "Sodda ruscha gaplarni oвЂqish va tushunish.",
+  "BoshlangвЂich daraja yakuniy testi."
+ ];
+ return lessons[Math.min(lessons.length-1,Math.max(0,l-1))];
+}
 
- let pin=
-  document.getElementById(
-   "pinInput"
-  ).value;
+function speakCurrentLesson(){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance("Hello! Let's learn English. Apple, book, cat, dog, school.");u.lang="en-US";speechSynthesis.speak(u)}
 
+function startMode(mode){
+ session.mode=mode;session.answered=0;session.correct=0;session.block=0;
+ if(mode==="lesson"){renderTeachingStep();return}
+ nextAdaptiveQuestion()
+}
 
- if(pin==="1234"){
+function englishExamples(l){
+ const arr=[
+  ["A a вЂ” /eЙЄ/","B b вЂ” /biЛђ/","C c вЂ” /siЛђ/"],
+  ["Hello вЂ” salom","Hi вЂ” salom","Bye вЂ” xayr"],
+  ["One вЂ” 1","Two вЂ” 2","Three вЂ” 3"],
+  ["Red вЂ” qizil","Blue вЂ” koвЂk","Green вЂ” yashil"],
+  ["Cat вЂ” mushuk","Dog вЂ” it","Bird вЂ” qush"],
+  ["Mother вЂ” ona","Father вЂ” ota","Sister вЂ” opa/singil"],
+  ["Book вЂ” kitob","Pen вЂ” ruchka","Bag вЂ” sumka"],
+  ["Apple вЂ” olma","Bread вЂ” non","Water вЂ” suv"],
+  ["I am a pupil.","You are my friend."],
+  ["What is this?","Who is he?","Where is it?"],
+  ["This is a red apple.","I have a book."],
+  ["Review: alphabet, words, sentences"]
+ ];
+ return arr[Math.min(arr.length-1,Math.max(0,l-1))];
+}
+function russianExamples(l){
+ const arr=[
+  ["Рђ Р°","Р‘ Р±","Р’ РІ"],
+  ["РџСЂРёРІРµС‚ вЂ” salom","РџРѕРєР° вЂ” xayr","РЎРїР°СЃРёР±Рѕ вЂ” rahmat"],
+  ["РћРґРёРЅ вЂ” 1","Р”РІР° вЂ” 2","РўСЂРё вЂ” 3"],
+  ["РљСЂР°СЃРЅС‹Р№ вЂ” qizil","РЎРёРЅРёР№ вЂ” koвЂk","Р—РµР»С‘РЅС‹Р№ вЂ” yashil"],
+  ["РљРѕС‚ вЂ” mushuk","РЎРѕР±Р°РєР° вЂ” it","РџС‚РёС†Р° вЂ” qush"],
+  ["РњР°РјР° вЂ” ona","РџР°РїР° вЂ” ota","РЎРµСЃС‚СЂР° вЂ” opa/singil"],
+  ["РљРЅРёРіР° вЂ” kitob","Р СѓС‡РєР° вЂ” ruchka","РЁРєРѕР»Р° вЂ” maktab"],
+  ["РЇР±Р»РѕРєРѕ вЂ” olma","РҐР»РµР± вЂ” non","Р’РѕРґР° вЂ” suv"],
+  ["РЇ СѓС‡РµРЅРёРє.","РўС‹ РјРѕР№ РґСЂСѓРі."],
+  ["РљС‚Рѕ СЌС‚Рѕ?","Р§С‚Рѕ СЌС‚Рѕ?","Р“РґРµ РєРЅРёРіР°?"],
+  ["Р­С‚Рѕ РєСЂР°СЃРЅРѕРµ СЏР±Р»РѕРєРѕ.","РЈ РјРµРЅСЏ РµСЃС‚СЊ РєРЅРёРіР°."],
+  ["Takrorlash: alifbo, soвЂz, gap"]
+ ];
+ return arr[Math.min(arr.length-1,Math.max(0,l-1))];
+}
 
-  document.getElementById(
-   "loginBox"
-  ).classList.add("hidden");
-
-
-  document.getElementById(
-   "parentPanel"
-  ).classList.remove("hidden");
-
-
-  refresh();
-
- }else{
-
-  document.getElementById(
-   "loginError"
-  ).innerHTML=
-
-  `<p class="error">
-   ❌ PIN noto‘g‘ri
-   </p>`;
-
+function renderTeachingStep(){
+ let s=session.subject,c=currentChild(),st=statFor(c,s);
+ let examples={
+ math:["3 + 2 = 5","7 в€’ 3 = 4"],
+ uzbek:["o + na = ona","bo + la = bola"],
+ reading:["Matnni oвЂqing в†’ asosiy fikrni ayting"],
+ writing:["A a","B b","M m"],
+ english:englishExamples(st.level),
+ russian:russianExamples(st.level),
+ literature:["Qahramon в†’ xatti-harakat в†’ xulosa"],
+ history:["Voqea в†’ sabab в†’ natija"],
+ geography:["Materik в†’ davlat в†’ poytaxt"],
+ biology:["Hujayra в†’ toвЂqima в†’ organ"],
+ physics:["v = s / t","F = m Г— a"],
+ chemistry:["Hв‚‚O вЂ” suv","Oв‚‚ вЂ” kislorod"],
+ informatics:["Algoritm в†’ qadamlar ketma-ketligi"],
+ logic:["2, 4, 6, 8, ... в†’ 10"]
+}[s]||["Mavzu boвЂyicha AI yoki lokal generator yangi misollar yaratadi."];
+ learningArea.innerHTML=`<div class="lessonBox"><h2>рџ“– Tushuntirish</h2><p class="lessonText">${lessonText(s,st.level,c.grade)}</p><h3>Misollar</h3>${examples.map(x=>`<div class="task">${x}</div>`).join("")}<div class="center">${s==="english"?'<button class="gray" onclick="speakEnglishExamples()">рџ”Љ Talaffuz</button>':""} <button class="green" onclick="session.mode='practice';nextAdaptiveQuestion()">Mashq qilamiz вћњ</button></div></div>`
+}
+function speakEnglishExamples(){let st=statFor(currentChild(),"english"),arr=englishExamples(st.level);let u=new SpeechSynthesisUtterance(arr.join(". "));u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}
+function nextAdaptiveQuestion(){
+ let c=currentChild(),st=statFor(c,session.subject),q=makeQuestion(session.subject,st.level,c.grade);
+ session.current=q;session.block++;
+ let isTest=session.mode==="test",limit=isTest?10:5;
+ learningArea.innerHTML=`<div class="lessonBox"><div class="row"><span class="badge">${session.mode==="test"?"рџ“ќ Test":"вњЏпёЏ Mashq"}</span><span class="badge">Daraja ${st.level}</span><span class="badge">${session.block}/${limit}</span></div><div class="question">${q.q}</div>${q.speak?`<div class="center"><button class="gray" onclick="speakWord('${esc(q.speak)}')">рџ”Љ Talaffuz</button></div>`:""}${q.choices?`<div class="choices">${q.choices.map(ch=>`<button class="choice" onclick="answerQuestion('${encodeURIComponent(ch)}')">${esc(ch)}</button>`).join("")}</div>`:`<input id="answerInput" class="answer" placeholder="Javobingiz"><div class="center"><button class="primary" onclick="answerQuestion()">Javob berish</button></div>`}<div id="feedback"></div></div>`;
+ if(!q.choices)setTimeout(()=>document.getElementById("answerInput")?.focus(),50)
+}
+function answerQuestion(choiceEnc){
+ let c=currentChild(),st=statFor(c,session.subject),q=session.current;
+ let ans=choiceEnc!==undefined?decodeURIComponent(choiceEnc):(document.getElementById("answerInput")?.value||"").trim();
+ if(!ans)return;
+ let ok=normalize(ans)===normalize(q.a);session.answered++;if(ok)session.correct++;st.answered++;if(ok)st.correct++;
+ st.last=today();
+ let pts=ok?Math.max(5,st.level*5):0;let earn=pts*(c.pointRate||100);
+ addActivity(c.id,"answer",`${subjectName(session.subject)}: ${q.q}`,pts,earn,{correct:ok});
+ let fb=document.getElementById("feedback");
+ if(ok)fb.innerHTML=`<div class="notice success">вњ… ToвЂgвЂri! +${pts} ball</div>`;
+ else fb.innerHTML=`<div class="notice"><b>вќЊ ToвЂgвЂri javob: ${esc(q.a)}</b><br>${esc(q.explain||"Yana bir bor sinab koвЂramiz.")}</div>`;
+ save();
+ setTimeout(()=>{
+  adaptLevel(st);
+  let limit=session.mode==="test"?10:5;
+  if(session.block>=limit)finishBlock();else nextAdaptiveQuestion()
+ },700)
+}
+function normalize(v){return String(v).trim().toLowerCase().replace(/вЂ™/g,"'")}
+function adaptLevel(st){
+ if(st.answered<5)return;
+ let recent=data.activity.filter(a=>a.child===session.userId&&a.type==="answer").slice(-10),good=recent.filter(a=>a.correct).length;
+ if(recent.length>=8&&good>=8)st.level=Math.min(12,st.level+1);
+ else if(recent.length>=8&&good<=3)st.level=Math.max(1,st.level-1);
+ save()
+}
+function finishBlock(){
+ let pct=Math.round(session.correct/session.answered*100),st=statFor(currentChild(),session.subject);
+ if(session.mode==="test"&&pct>=80){st.level=Math.min(12,st.level+1);save()}
+ learningArea.innerHTML=`<div class="hero"><div class="big">${pct>=80?"рџЏ†":"рџ‘Џ"}</div><h2>${session.mode==="test"?"Test":"Mashq bloki"} tugadi</h2><div class="stars">в­ђ ${session.correct}/${session.answered} вЂ” ${pct}%</div><p>Hozirgi daraja: <b>${st.level}</b></p><p class="muted">Kunlik limit yoвЂq. Kuchingiz va qiziqishingizga qarab davom etishingiz mumkin.</p><button class="green" onclick="session.answered=0;session.correct=0;session.block=0;nextAdaptiveQuestion()">Yana davom etish</button> <button class="gray" onclick="showLessonIntro()">Bugunga yetarli</button></div>`
+}
+function makeQuestion(s,l,g){
+ let max=Math.min(100,10+l*10);
+ if(s==="math"){
+  let a=rnd(1,max),b=rnd(1,max);
+  if(l<=2){a=rnd(0,10);b=rnd(0,10-a);return {q:`${a} + ${b} = ?`,a:String(a+b),explain:`${a} ga ${b} ni qoвЂshamiz.`}}
+  if(l<=4){a=rnd(5,max);b=rnd(0,a);return {q:`${a} в€’ ${b} = ?`,a:String(a-b),explain:`${a} dan ${b} ni ayiramiz.`}}
+  if(l<=7){let m=rnd(2,9),n=rnd(2,10);return {q:`${m} Г— ${n} = ?`,a:String(m*n),explain:`${m} ni ${n} marta qoвЂshish.`}}
+  let x=rnd(2,20),y=rnd(2,20);return {q:`Ali ${x} ta qalam oldi, yana ${y} ta qalam oldi. Jami nechta?`,a:String(x+y),explain:"Ikki miqdorni qoвЂshamiz."}
  }
-
-}
-
-
-/* ================================================
-STATISTIKANI YANGILASH
-================================================ */
-
-function refreshStatsOnly(){
-
- renderChildStats();
- renderStats();
- renderParentLessons();
-
-}
-
-
-/* ================================================
-UMUMIY REFRESH
-================================================ */
-
-function refresh(){
-
- renderChildren();
-
- fillSelect("autoChild");
- fillSelect("manualChild");
- fillSelect("homeChild");
-
- /*
-  MUHIM:
-  Bola tanlanganda eski savol sessiyasini
-  qayta yaratmaymiz.
- */
-
- if(!lessonSession){
-
-  startLesson();
-
+ if(s==="uzbek"){
+  let bank=l<=2?[
+   {q:"вЂњonaвЂќ soвЂzida nechta harf bor?",a:"3",explain:"o-n-a вЂ” uchta harf."},
+   {q:"вЂњbolaвЂќ soвЂzining birinchi harfi?",a:"b",explain:"Bola B harfi bilan boshlanadi."},
+   {q:"BoвЂgвЂinlarni qoвЂshing: bo + la = ?",a:"bola",explain:"bo + la = bola."},
+   {q:"Qaysi soвЂz toвЂgвЂri yozilgan?",a:"maktab",choices:["maktap","maktab","makdab","maktabb"],explain:"ToвЂgвЂri yozilishi: maktab."}
+  ]:[
+   {q:"Gapni toвЂldiring: Men ... boraman.",a:"maktabga",choices:["maktabga","maktapga","maktabda","maktab"],explain:"YoвЂnalish maвЂ™nosida -ga qoвЂshimchasi ishlatiladi."},
+   {q:"вЂњkitoblarвЂќ soвЂzida koвЂplik qoвЂshimchasi qaysi?",a:"lar",explain:"kitob + lar."},
+   {q:"Qaysi gap oxiriga soвЂroq belgisi qoвЂyiladi?",a:"Sen maktabga bordingmi",choices:["Men kitob oвЂqidim","Sen maktabga bordingmi","Bugun havo iliq","Onam ovqat qildi"],explain:"Savol berilgan gapga ? qoвЂyiladi."}
+  ];return pick(bank)
  }
+ if(s==="writing"){
+  let letters=["A a","M m","N n","O o","B b","D d","E e","L l","S s","T t"];let t=pick(letters);
+  return {q:`Daftarga chiroyli yozing: ${t}. Yozib boвЂlgach вЂњtayyorвЂќ deb yozing.`,a:"tayyor",explain:"Harfni shoshmasdan, bir xil balandlikda yozing."}
+ }
+ if(s==="english"){
+  const level=Math.max(1,Math.min(12,l));
+  const banks={
+   1:[
+    {q:"Qaysi harf A?",a:"A",choices:["A","B","C","D"],speak:"A",explain:"Bu A harfi."},
+    {q:"Qaysi harf B?",a:"B",choices:["D","B","A","C"],speak:"B",explain:"Bu B harfi."}
+   ],
+   2:[
+    {q:"Hello вЂ” ?",a:"salom",choices:["salom","xayr","rahmat","iltimos"],speak:"hello",explain:"Hello вЂ” salom."},
+    {q:"Bye вЂ” ?",a:"xayr",choices:["salom","xayr","kitob","suv"],speak:"bye",explain:"Bye вЂ” xayr."}
+   ],
+   3:[
+    {q:"Three вЂ” ?",a:"3",choices:["1","2","3","4"],speak:"three",explain:"Three вЂ” 3."},
+    {q:"Five вЂ” ?",a:"5",choices:["4","5","6","7"],speak:"five",explain:"Five вЂ” 5."}
+   ],
+   4:[
+    {q:"Red вЂ” ?",a:"qizil",choices:["qizil","koвЂk","oq","qora"],speak:"red",explain:"Red вЂ” qizil."},
+    {q:"Blue вЂ” ?",a:"koвЂk",choices:["yashil","koвЂk","sariq","oq"],speak:"blue",explain:"Blue вЂ” koвЂk."}
+   ],
+   5:[
+    {q:"Cat вЂ” ?",a:"mushuk",choices:["it","mushuk","qush","ot"],speak:"cat",explain:"Cat вЂ” mushuk."},
+    {q:"Dog вЂ” ?",a:"it",choices:["it","mushuk","sigir","qush"],speak:"dog",explain:"Dog вЂ” it."}
+   ],
+   6:[
+    {q:"Mother вЂ” ?",a:"ona",choices:["ota","ona","aka","bobo"],speak:"mother",explain:"Mother вЂ” ona."},
+    {q:"Father вЂ” ?",a:"ota",choices:["ona","ota","opa","buvi"],speak:"father",explain:"Father вЂ” ota."}
+   ],
+   7:[
+    {q:"Book вЂ” ?",a:"kitob",choices:["kitob","ruchka","sumka","stol"],speak:"book",explain:"Book вЂ” kitob."},
+    {q:"Pen вЂ” ?",a:"ruchka",choices:["qalam","ruchka","kitob","maktab"],speak:"pen",explain:"Pen вЂ” ruchka."}
+   ],
+   8:[
+    {q:"Apple вЂ” ?",a:"olma",choices:["olma","non","suv","sut"],speak:"apple",explain:"Apple вЂ” olma."},
+    {q:"Water вЂ” ?",a:"suv",choices:["non","suv","olma","guruch"],speak:"water",explain:"Water вЂ” suv."}
+   ],
+   9:[
+    {q:"ToвЂgвЂri gapni tanlang: Men oвЂquvchiman.",a:"I am a pupil.",choices:["I am a pupil.","You are a pupil.","I is pupil.","Am I pupil."],speak:"I am a pupil",explain:"I bilan am ishlatiladi."},
+    {q:"You ... my friend.",a:"are",choices:["am","is","are","be"],speak:"You are my friend",explain:"You bilan are ishlatiladi."}
+   ],
+   10:[
+    {q:"вЂњBu nima?вЂќ inglizcha?",a:"What is this?",choices:["What is this?","Who is he?","Where is it?","How old are you?"],speak:"What is this",explain:"What is this? вЂ” Bu nima?"},
+    {q:"вЂњU kim?вЂќ inglizcha?",a:"Who is he?",choices:["Where is he?","Who is he?","What is he?","How is he?"],speak:"Who is he",explain:"Who вЂ” kim."}
+   ],
+   11:[
+    {q:"This is a red apple. Apple qanday rangda?",a:"red",choices:["red","blue","green","black"],speak:"This is a red apple",explain:"Gapda red deyilgan."}
+   ],
+   12:[
+    {q:"I have a book. Bu gap nimani anglatadi?",a:"Menda kitob bor.",choices:["Menda kitob bor.","Men kitob oвЂqiyman.","Bu kitob qizil.","Kitob stol ustida."],speak:"I have a book",explain:"I have вЂ” menda bor."}
+   ]
+  };
+  return pick(banks[level]||banks[1])
+ }
+ if(s==="reading"){
+  return pick([
+   {q:"вЂњAli maktabga bordi. U kitob oldi.вЂќ Ali qayerga bordi?",a:"maktabga",choices:["bozorga","maktabga","uyga","bogвЂga"],explain:"Matnda Ali maktabga borgani aytilgan."},
+   {q:"вЂњBahorda gullar ochiladi.вЂќ Gullar qachon ochiladi?",a:"bahorda",choices:["qishda","bahorda","kuzda","kechasi"],explain:"Javob matn ichida bor."}
+  ])
+ }
+ if(s==="russian"){
+  const level=Math.max(1,Math.min(12,l));
+  const banks={
+   1:[
+    {q:"Qaysi rus harfi Рђ?",a:"Рђ",choices:["Рђ","Р‘","Р’","Р“"],speak:"Рђ",explain:"Bu Рђ harfi."},
+    {q:"Qaysi rus harfi Р‘?",a:"Р‘",choices:["Р’","Р“","Р‘","Рђ"],speak:"Р‘",explain:"Bu Р‘ harfi."}
+   ],
+   2:[
+    {q:"РџСЂРёРІРµС‚ вЂ” ?",a:"salom",choices:["salom","xayr","rahmat","kitob"],speak:"РџСЂРёРІРµС‚",explain:"РџСЂРёРІРµС‚ вЂ” salom."},
+    {q:"РЎРїР°СЃРёР±Рѕ вЂ” ?",a:"rahmat",choices:["salom","rahmat","xayr","iltimos"],speak:"РЎРїР°СЃРёР±Рѕ",explain:"РЎРїР°СЃРёР±Рѕ вЂ” rahmat."}
+   ],
+   3:[
+    {q:"РўСЂРё вЂ” ?",a:"3",choices:["1","2","3","4"],speak:"С‚СЂРё",explain:"РўСЂРё вЂ” 3."},
+    {q:"РџСЏС‚СЊ вЂ” ?",a:"5",choices:["4","5","6","7"],speak:"РїСЏС‚СЊ",explain:"РџСЏС‚СЊ вЂ” 5."}
+   ],
+   4:[
+    {q:"РљСЂР°СЃРЅС‹Р№ вЂ” ?",a:"qizil",choices:["qizil","koвЂk","oq","qora"],speak:"РєСЂР°СЃРЅС‹Р№",explain:"РљСЂР°СЃРЅС‹Р№ вЂ” qizil."},
+    {q:"РЎРёРЅРёР№ вЂ” ?",a:"koвЂk",choices:["yashil","koвЂk","sariq","oq"],speak:"СЃРёРЅРёР№",explain:"РЎРёРЅРёР№ вЂ” koвЂk."}
+   ],
+   5:[
+    {q:"РљРѕС‚ вЂ” ?",a:"mushuk",choices:["it","mushuk","qush","ot"],speak:"РєРѕС‚",explain:"РљРѕС‚ вЂ” mushuk."},
+    {q:"РЎРѕР±Р°РєР° вЂ” ?",a:"it",choices:["it","mushuk","sigir","qush"],speak:"СЃРѕР±Р°РєР°",explain:"РЎРѕР±Р°РєР° вЂ” it."}
+   ],
+   6:[
+    {q:"РњР°РјР° вЂ” ?",a:"ona",choices:["ota","ona","aka","buvi"],speak:"РјР°РјР°",explain:"РњР°РјР° вЂ” ona."},
+    {q:"РџР°РїР° вЂ” ?",a:"ota",choices:["ona","ota","opa","bobo"],speak:"РїР°РїР°",explain:"РџР°РїР° вЂ” ota."}
+   ],
+   7:[
+    {q:"РљРЅРёРіР° вЂ” ?",a:"kitob",choices:["kitob","ruchka","sumka","stol"],speak:"РєРЅРёРіР°",explain:"РљРЅРёРіР° вЂ” kitob."},
+    {q:"Р СѓС‡РєР° вЂ” ?",a:"ruchka",choices:["ruchka","kitob","maktab","sumka"],speak:"СЂСѓС‡РєР°",explain:"Р СѓС‡РєР° вЂ” ruchka."}
+   ],
+   8:[
+    {q:"РЇР±Р»РѕРєРѕ вЂ” ?",a:"olma",choices:["olma","non","suv","sut"],speak:"СЏР±Р»РѕРєРѕ",explain:"РЇР±Р»РѕРєРѕ вЂ” olma."},
+    {q:"Р’РѕРґР° вЂ” ?",a:"suv",choices:["non","suv","olma","guruch"],speak:"РІРѕРґР°",explain:"Р’РѕРґР° вЂ” suv."}
+   ],
+   9:[
+    {q:"РЇ ... СѓС‡РµРЅРёРє.",a:"вЂ”",choices:["вЂ”","РµСЃС‚СЊ","Р±С‹С‚СЊ","СЌС‚Рѕ"],speak:"РЇ СѓС‡РµРЅРёРє",explain:"Rus tilida hozirgi zamonda 'to be' koвЂpincha aytilmaydi: РЇ СѓС‡РµРЅРёРє."}
+   ],
+   10:[
+    {q:"вЂњBu kim?вЂќ ruscha?",a:"РљС‚Рѕ СЌС‚Рѕ?",choices:["РљС‚Рѕ СЌС‚Рѕ?","Р§С‚Рѕ СЌС‚Рѕ?","Р“РґРµ СЌС‚Рѕ?","РљР°Рє СЌС‚Рѕ?"],speak:"РљС‚Рѕ СЌС‚Рѕ",explain:"РљС‚Рѕ вЂ” kim."},
+    {q:"вЂњBu nima?вЂќ ruscha?",a:"Р§С‚Рѕ СЌС‚Рѕ?",choices:["РљС‚Рѕ СЌС‚Рѕ?","Р§С‚Рѕ СЌС‚Рѕ?","Р“РґРµ СЌС‚Рѕ?","РљРѕРіРґР° СЌС‚Рѕ?"],speak:"Р§С‚Рѕ СЌС‚Рѕ",explain:"Р§С‚Рѕ вЂ” nima."}
+   ],
+   11:[
+    {q:"Р­С‚Рѕ РєСЂР°СЃРЅРѕРµ СЏР±Р»РѕРєРѕ. Olma qanday rangda?",a:"РєСЂР°СЃРЅРѕРµ",choices:["РєСЂР°СЃРЅРѕРµ","СЃРёРЅРµРµ","Р·РµР»С‘РЅРѕРµ","Р±РµР»РѕРµ"],speak:"Р­С‚Рѕ РєСЂР°СЃРЅРѕРµ СЏР±Р»РѕРєРѕ",explain:"Gapda РєСЂР°СЃРЅРѕРµ deyilgan."}
+   ],
+   12:[
+    {q:"РЈ РјРµРЅСЏ РµСЃС‚СЊ РєРЅРёРіР°. MaвЂ™nosi?",a:"Menda kitob bor.",choices:["Menda kitob bor.","Men maktabdaman.","Bu kitob qizil.","Kitob stol ustida."],speak:"РЈ РјРµРЅСЏ РµСЃС‚СЊ РєРЅРёРіР°",explain:"РЈ РјРµРЅСЏ РµСЃС‚СЊ вЂ” menda bor."}
+   ]
+  };
+  return pick(banks[level]||banks[1])
+ }
+ if(s==="literature"){
+  return pick([
+   {q:"Asardagi voqealarda qatnashuvchi shaxs nima deyiladi?",a:"qahramon",choices:["qahramon","formula","xarita","tajriba"],explain:"Asarda qatnashuvchi obraz вЂ” qahramon."},
+   {q:"Matnning asosiy fikri nima deyiladi?",a:"gвЂoya",choices:["gвЂoya","sana","formula","harf"],explain:"Asarning asosiy fikri вЂ” gвЂoya."}
+  ])
+ }
+ if(s==="history"){
+  return pick([
+   {q:"Tarixda voqealarning vaqtini aniqlash uchun nima muhim?",a:"sana",choices:["sana","rang","formula","harf"],explain:"Tarixiy voqea vaqtini sana koвЂrsatadi."},
+   {q:"Sababdan keyin nima yuz beradi?",a:"natija",choices:["natija","harf","formula","rang"],explain:"Sabab muayyan natijaga olib keladi."}
+  ])
+ }
+ if(s==="geography"){
+  return pick([
+   {q:"Yer yuzining katta quruqlik qismi nima deyiladi?",a:"materik",choices:["materik","daryo","koвЂl","shahar"],explain:"Katta quruqlik qismi вЂ” materik."},
+   {q:"Dunyoning eng katta okeani?",a:"tinch okeani",choices:["Tinch okeani","Hind okeani","Atlantika okeani","Shimoliy Muz okeani"],explain:"Eng katta okean вЂ” Tinch okeani."}
+  ])
+ }
+ if(s==="biology"){
+  return pick([
+   {q:"Tirik organizmning eng kichik tuzilish birligi?",a:"hujayra",choices:["hujayra","atom","xarita","formula"],explain:"Organizmlar hujayralardan tuzilgan."},
+   {q:"OвЂsimliklar yorugвЂlik yordamida oziqa hosil qilishi nima deyiladi?",a:"fotosintez",choices:["fotosintez","bugвЂlanish","erish","qaynash"],explain:"Bu jarayon fotosintez deyiladi."}
+  ])
+ }
+ if(s==="physics"){
+  return pick([
+   {q:"Tezlik formulasi qaysi?",a:"v=s/t",choices:["v=s/t","F=m/a","p=m+t","A=v+s"],explain:"Tezlik = masofa / vaqt."},
+   {q:"Kuchning SI birligi?",a:"nyuton",choices:["nyuton","metr","sekund","litr"],explain:"Kuch Nyuton (N) bilan oвЂlchanadi."}
+  ])
+ }
+ if(s==="chemistry"){
+  return pick([
+   {q:"Suvning kimyoviy formulasi?",a:"h2o",choices:["H2O","CO2","O2","NaCl"],explain:"Suv вЂ” Hв‚‚O."},
+   {q:"Kislorodning formulasi?",a:"o2",choices:["O2","H2","CO2","N2O"],explain:"Molekulyar kislorod вЂ” Oв‚‚."}
+  ])
+ }
+ if(s==="informatics"){
+  return pick([
+   {q:"Algoritm nima?",a:"qadamlar ketma-ketligi",choices:["qadamlar ketma-ketligi","rasm turi","ovoz","xarita"],explain:"Algoritm вЂ” vazifani bajarish qadamlarining tartibi."},
+   {q:"Kompyuterning hisoblash va boshqarish qismi?",a:"protsessor",choices:["protsessor","monitor","sichqoncha","printer"],explain:"Asosiy hisoblashni protsessor bajaradi."}
+  ])
+ }
+ let bank=[
+  {q:"2, 4, 6, 8, ... keyingi son?",a:"10",explain:"Har safar 2 qoвЂshilyapti."},
+  {q:"1, 3, 5, 7, ... keyingi son?",a:"9",explain:"Toq sonlar ketma-ketligi."},
+  {q:"Qaysi biri ortiqcha?",a:"sabzi",choices:["olma","nok","banan","sabzi"],explain:"Sabzi meva emas."},
+  {q:"Qaysi biri ortiqcha?",a:"stol",choices:["mushuk","it","qush","stol"],explain:"Stol hayvon emas."}
+ ];return pick(bank)
+}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function speakWord(w){let u=new SpeechSynthesisUtterance(w);u.lang=session.subject==="russian"?"ru-RU":"en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}
 
- renderHome();
-
- renderChildStats();
-
- renderPending();
-
- renderParentLessons();
-
- renderStats();
-
+function startAssignment(aid){
+ let a=data.assignments.find(x=>x.id===aid);if(!a)return;a.status="started";save();session.subject=a.subject;openLearn(a.subject);session.mode=a.type==="test"?"test":"practice";session.assignmentId=aid;nextAdaptiveQuestion()
 }
 
+function startGame(type){
+ let q;if(type==="sequence")q=makeQuestion("logic",2,1);
+ else if(type==="odd")q=pick([{q:"Ortiqchasini toping",a:"stol",choices:["it","mushuk","qush","stol"]},{q:"Ortiqchasini toping",a:"sabzi",choices:["olma","nok","banan","sabzi"]}]);
+ else if(type==="speed"){let a=rnd(1,20),b=rnd(1,20);q={q:`${a}+${b}=?`,a:String(a+b)}}
+ else {let w=pick(["OLMA","KITOB","BOLA","MAKTAB"]);q={q:`Harflarni toвЂgвЂri tartibga keltiring: ${shuffle(w.split("")).join(" ")}`,a:w}}
+ gameArea.innerHTML=`<div class="question">${q.q}</div>${q.choices?q.choices.map(x=>`<button class="choice" onclick="gameAnswer('${encodeURIComponent(x)}','${encodeURIComponent(q.a)}')">${x}</button>`).join(" "):`<input id="gameInput" class="answer"><br><button class="primary" onclick="gameAnswer(null,'${encodeURIComponent(q.a)}')">Tekshirish</button>`}`
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function gameAnswer(x,a){let ans=x?decodeURIComponent(x):(gameInput.value||"").trim(),right=decodeURIComponent(a);gameArea.innerHTML=`<h2>${normalize(ans)===normalize(right)?"вњ… ToвЂgвЂri!":"вќЊ Javob: "+esc(right)}</h2><button class="green" onclick="startGame('sequence')">Yana oвЂyin</button>`}
 
-/* ================================================
-START
-================================================ */
 
-refresh();
+let memoryState=null,speedState=null;
 
+function startMemoryGame(){
+ let symbols=["рџЌЋ","рџђ¶","рџ“","в­ђ"];
+ let cards=shuffle([...symbols,...symbols].map((v,i)=>({id:i,v,open:false,done:false})));
+ memoryState={cards,first:null,lock:false,moves:0};
+ renderMemoryGame();
+}
+function renderMemoryGame(){
+ let s=memoryState;if(!s)return;
+ gameArea.innerHTML=`<h2>рџ§  Xotira kartalari</h2><p>Yurishlar: ${s.moves}</p>
+ <div style="display:grid;grid-template-columns:repeat(4,80px);gap:10px;justify-content:center">
+ ${s.cards.map((c,i)=>`<button style="height:80px;font-size:32px" class="choice" onclick="flipMemory(${i})">${c.open||c.done?c.v:"вќ“"}</button>`).join("")}
+ </div>`;
+}
+function flipMemory(i){
+ let s=memoryState,c=s.cards[i];if(!s||s.lock||c.done||c.open)return;
+ c.open=true;
+ if(s.first===null){s.first=i;renderMemoryGame();return}
+ s.moves++;let a=s.cards[s.first];
+ if(a.v===c.v){a.done=c.done=true;s.first=null;renderMemoryGame();if(s.cards.every(x=>x.done)){gameArea.innerHTML=`<h2>рџЏ† Ajoyib!</h2><p>${s.moves} yurishda tugatdingiz.</p><button class="green" onclick="startMemoryGame()">Yana</button>`}}
+ else{s.lock=true;renderMemoryGame();setTimeout(()=>{a.open=false;c.open=false;s.first=null;s.lock=false;renderMemoryGame()},700)}
+}
+
+function startSpeedGame(){
+ speedState={score:0,left:30,q:null,timer:null};nextSpeedQuestion();
+ speedState.timer=setInterval(()=>{speedState.left--;updateSpeedHeader();if(speedState.left<=0){clearInterval(speedState.timer);gameArea.innerHTML=`<h2>вЏ± Vaqt tugadi!</h2><p>Natija: <b>${speedState.score}</b> ta toвЂgвЂri javob.</p><button class="primary" onclick="startSpeedGame()">Qayta</button>`}},1000)
+}
+function nextSpeedQuestion(){
+ let a=rnd(1,20),b=rnd(1,20);speedState.q={a:a+b,text:`${a} + ${b} = ?`};
+ gameArea.innerHTML=`<div id="speedHeader"><b>вЏ± ${speedState.left}s</b> вЂў вњ… ${speedState.score}</div><div class="question">${speedState.q.text}</div><input id="speedInput" class="answer" inputmode="numeric"><br><button class="primary" onclick="checkSpeed()">Javob</button>`;
+ setTimeout(()=>document.getElementById("speedInput")?.focus(),50)
+}
+function updateSpeedHeader(){let e=document.getElementById("speedHeader");if(e)e.innerHTML=`<b>вЏ± ${speedState.left}s</b> вЂў вњ… ${speedState.score}`}
+function checkSpeed(){let v=Number(document.getElementById("speedInput")?.value);if(v===speedState.q.a)speedState.score++;nextSpeedQuestion()}
+
+function startLanguageMatch(lang){
+ let en=[["apple","olma"],["book","kitob"],["cat","mushuk"],["dog","it"],["water","suv"]];
+ let ru=[["СЏР±Р»РѕРєРѕ","olma"],["РєРЅРёРіР°","kitob"],["РєРѕС‚","mushuk"],["СЃРѕР±Р°РєР°","it"],["РІРѕРґР°","suv"]];
+ let pair=pick(lang==="english"?en:ru),wrong=shuffle((lang==="english"?en:ru).filter(x=>x[1]!==pair[1]).map(x=>x[1])).slice(0,3);
+ let choices=shuffle([pair[1],...wrong]);
+ gameArea.innerHTML=`<h2>${lang==="english"?"рџ‡¬рџ‡§ English Match":"рџ‡·рџ‡є Р СѓСЃСЃРєРёР№ Match"}</h2><div class="question">${pair[0]}</div><div class="choices">${choices.map(x=>`<button class="choice" onclick="finishLanguageMatch('${encodeURIComponent(x)}','${encodeURIComponent(pair[1])}','${lang}')">${x}</button>`).join("")}</div>`;
+ let u=new SpeechSynthesisUtterance(pair[0]);u.lang=lang==="english"?"en-US":"ru-RU";speechSynthesis.cancel();speechSynthesis.speak(u)
+}
+function finishLanguageMatch(a,b,lang){
+ let ok=decodeURIComponent(a)===decodeURIComponent(b);
+ gameArea.innerHTML=`<h2>${ok?"вњ… ToвЂgвЂri!":"вќЊ ToвЂgвЂri javob: "+decodeURIComponent(b)}</h2><button class="green" onclick="startLanguageMatch('${lang}')">Yana</button>`
+}
+
+function startListeningGame(){
+ let lang=pick(["english","russian"]);
+ let bank=lang==="english"?[["apple","olma"],["book","kitob"],["cat","mushuk"],["red","qizil"]]:[["СЏР±Р»РѕРєРѕ","olma"],["РєРЅРёРіР°","kitob"],["РєРѕС‚","mushuk"],["РєСЂР°СЃРЅС‹Р№","qizil"]];
+ let pair=pick(bank),choices=shuffle([pair[1],...shuffle(bank.filter(x=>x[1]!==pair[1]).map(x=>x[1])).slice(0,3)]);
+ gameArea.innerHTML=`<h2>рџ‘‚ Eshitib top</h2><button class="primary" onclick="speakGameWord('${encodeURIComponent(pair[0])}','${lang}')">рџ”Љ Eshitish</button><div class="choices">${choices.map(x=>`<button class="choice" onclick="finishListening('${encodeURIComponent(x)}','${encodeURIComponent(pair[1])}')">${x}</button>`).join("")}</div>`;
+ speakGameWord(encodeURIComponent(pair[0]),lang)
+}
+function speakGameWord(w,lang){let u=new SpeechSynthesisUtterance(decodeURIComponent(w));u.lang=lang==="english"?"en-US":"ru-RU";speechSynthesis.cancel();speechSynthesis.speak(u)}
+function finishListening(a,b){let ok=decodeURIComponent(a)===decodeURIComponent(b);gameArea.innerHTML=`<h2>${ok?"вњ… ToвЂgвЂri!":"вќЊ ToвЂgвЂri javob: "+decodeURIComponent(b)}</h2><button class="green" onclick="startListeningGame()">Yana</button>`}
+
+function saveAISettings(){data.ai={mode:aiMode.value,url:aiUrl.value.trim(),lang:aiLang.value};save();aiStatus.innerHTML='<p class="success">Sozlamalar saqlandi.</p>'}
+async function testAI(){aiStatus.innerHTML="<p>Tekshirilmoqda...</p>";try{let r=await aiGenerate("Salom. Bitta sodda matematika savoli yarat.",data.children[0],"math");aiStatus.innerHTML=`<div class="notice">${esc(r.text||r)}</div>`}catch(e){aiStatus.innerHTML=`<p class="error">${esc(e.message)}</p>`}}
+async function runAIGenerator(){
+ let c=childById(aiChild.value);if(!c){alert("Bola tanlang.");return}aiOutput.innerHTML="<p>Yaratilmoqda...</p>";
+ try{let r=await aiGenerate(aiPrompt.value||`${c.grade}-sinf uchun qiziqarli aralash topshiriqlar yarat`,c,"logic");aiOutput.innerHTML=`<div class="task" style="white-space:pre-wrap">${esc(r.text||r)}</div>`}catch(e){aiOutput.innerHTML=`<p class="error">${esc(e.message)}</p>`}
+}
+async function aiGenerate(prompt,c,subject){
+ if(data.ai.mode==="server"&&data.ai.url){
+  let res=await fetch(data.ai.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,child:{name:c?.name,grade:c?.grade},subject})});
+  if(!res.ok)throw new Error("AI server javob bermadi: "+res.status);
+  let j=await res.json();return {text:j.text||j.output||JSON.stringify(j)}
+ }
+ let g=c?.grade||1;
+ let samples=[];
+ for(let i=0;i<8;i++){let q=makeQuestion(subject||"logic",Math.max(1,g),g);samples.push(`${i+1}. ${q.q}  [Javob: ${q.a}]`)}
+ return {text:`AQILLI LOKAL GENERATOR\n\n${prompt}\n\n${samples.join("\n")}\n\nрџЋ® Bonus oвЂyin: ketma-ketlikni davom ettirish yoki ortiqchasini topish.`}
+}
+function changeParentPin(){let p=newParentPin.value.trim();if(!/^\d{4}$/.test(p)){alert("4 raqam kiriting.");return}data.parentPin=p;save();newParentPin.value="";alert("PIN oвЂzgardi.")}
+function backup(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="bilim_ustoz_backup.json";a.click();URL.revokeObjectURL(u)}
+function restoreBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Backup tiklandi.");refreshParent()}catch(err){alert("Backup fayli notoвЂgвЂri.")}};r.readAsText(f)}
+function resetAll(){if(confirm("Haqiqatan ham barcha maвЂ™lumotlarni oвЂchirasizmi?")){localStorage.removeItem(DBKEY);data=defaults();logout()}}
 </script>
-
 </body>
 </html>
