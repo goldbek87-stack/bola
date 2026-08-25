@@ -1,0 +1,14 @@
+{
+  "name": "bilim-va-mukofot",
+  "version": "1.0.0",
+  "description": "Bilim va Mukofot - Android ilova",
+  "displayName": "Bilim va Mukofot",
+  "devDependencies": {
+    "cordova-android": "^13.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ]
+  }
+}

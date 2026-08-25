@@ -1,0 +1,2614 @@
+﻿<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bilim va Mukofot V4</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#eaf5ff,#f8fbff);
+ color:#18324a;
+}
+
+.app{
+ max-width:1100px;
+ margin:auto;
+ padding:18px;
+}
+
+header,.card{
+ background:white;
+ border-radius:22px;
+ box-shadow:0 8px 30px #0001;
+}
+
+header{
+ padding:20px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:15px;
+}
+
+h1{margin:0;color:#1769aa}
+.sub{color:#64748b;margin-top:6px}
+
+nav{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap;
+ margin:18px 0;
+}
+
+button{
+ border:0;
+ border-radius:13px;
+ padding:12px 18px;
+ font-weight:bold;
+ cursor:pointer;
+ font-size:16px;
+}
+
+.nav{
+ background:#fff;
+ box-shadow:0 3px 12px #0001;
+}
+
+.nav.active{
+ background:#1769aa;
+ color:white;
+}
+
+.primary{background:#1769aa;color:white}
+.green{background:#20a36a;color:white}
+.orange{background:#f59e0b;color:white}
+.red{background:#d83d3d;color:white}
+.gray{background:#e8eef4}
+
+.card{
+ padding:22px;
+ margin-bottom:16px;
+}
+
+.screen{display:none}
+.screen.active{display:block}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+}
+
+.stat{
+ background:#f4f9ff;
+ border-radius:17px;
+ padding:16px;
+}
+
+.stat b{
+ display:block;
+ font-size:23px;
+ margin-top:6px;
+}
+
+input,textarea,select{
+ width:100%;
+ padding:13px;
+ border:2px solid #dce6ee;
+ border-radius:12px;
+ font-size:16px;
+ margin:5px 0 12px;
+}
+
+textarea{min-height:100px}
+
+.task{
+ border:1px solid #e1e9f0;
+ border-radius:16px;
+ padding:16px;
+ margin:10px 0;
+}
+
+.badge{
+ display:inline-block;
+ background:#edf6ff;
+ padding:8px 12px;
+ border-radius:12px;
+ font-weight:bold;
+}
+
+.reward{
+ color:#138a55;
+ font-weight:bold;
+}
+
+.notice{
+ background:#fff7d9;
+ color:#725900;
+ padding:14px;
+ border-radius:14px;
+ margin-bottom:14px;
+}
+
+.success{
+ color:#168753;
+ font-weight:bold;
+}
+
+.error{
+ color:#d33;
+ font-weight:bold;
+}
+
+.hidden{display:none!important}
+
+/* ===============================
+   BOLA SAVOL OYNASI
+================================ */
+
+.questionBox{
+ max-width:650px;
+ margin:20px auto;
+ text-align:center;
+ padding:30px 20px;
+ border-radius:25px;
+ background:linear-gradient(135deg,#f4faff,#ffffff);
+ box-shadow:0 8px 30px #0001;
+}
+
+.questionNumber{
+ font-size:20px;
+ color:#1769aa;
+ font-weight:bold;
+ margin-bottom:10px;
+}
+
+.questionText{
+ font-size:30px;
+ font-weight:bold;
+ line-height:1.5;
+ margin:25px 0;
+}
+
+.answerInput{
+ text-align:center;
+ font-size:28px;
+ max-width:350px;
+ margin:auto;
+ display:block;
+}
+
+.nextButton{
+ margin-top:20px;
+ font-size:20px;
+ padding:15px 35px;
+}
+
+.bigResult{
+ text-align:center;
+ padding:30px;
+}
+
+.resultNumber{
+ font-size:45px;
+ font-weight:bold;
+ color:#1769aa;
+}
+
+.starResult{
+ font-size:30px;
+ color:#f59e0b;
+}
+
+.moneyResult{
+ font-size:28px;
+ color:#168753;
+ font-weight:bold;
+ margin:15px 0;
+}
+
+.progress{
+ height:14px;
+ background:#e7edf3;
+ border-radius:20px;
+ overflow:hidden;
+ margin:15px 0;
+}
+
+.progress div{
+ height:100%;
+ background:#20a36a;
+ width:0%;
+ transition:.3s;
+}
+
+.profile{
+ display:flex;
+ align-items:center;
+ gap:15px;
+ padding:15px;
+ border:2px solid #e2eaf1;
+ border-radius:17px;
+ margin:9px 0;
+ cursor:pointer;
+}
+
+.profile.selected{
+ border-color:#1769aa;
+ background:#f1f8ff;
+}
+
+.avatar{
+ font-size:40px;
+}
+
+@media(max-width:750px){
+
+ header{display:block}
+
+ .grid{
+  grid-template-columns:repeat(2,1fr);
+ }
+
+ .questionText{
+  font-size:25px;
+ }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+<div>
+
+<h1>🌟 Bilim va Mukofot</h1>
+
+<div class="sub">
+O‘qish • uy ishlari • ball • mukofot
+</div>
+
+</div>
+
+<div class="badge">
+👦 <span id="headerChild">Bola tanlanmagan</span>
+</div>
+
+</header>
+
+
+<nav>
+
+<button class="nav active"
+onclick="openPage('child',this)">
+👦 Bola
+</button>
+
+<button class="nav"
+onclick="openPage('parent',this)">
+👨‍👩‍👧 Ota-ona
+</button>
+
+<button class="nav"
+onclick="openPage('stats',this)">
+📊 Statistika
+</button>
+
+</nav>
+
+
+<!-- =================================================
+BOLA
+================================================= -->
+
+<section id="child" class="screen active">
+
+<div class="card">
+
+<h2>👦 Bola profilini tanlang</h2>
+
+<div id="childrenList"></div>
+
+</div>
+
+
+<div id="childPanel" class="hidden">
+
+<div class="card">
+
+<div class="grid">
+
+<div class="stat">
+⭐ Bugungi ball
+<b id="todayPoints">0</b>
+</div>
+
+<div class="stat">
+💰 Bugungi pul
+<b id="todayMoney">0</b>
+</div>
+
+<div class="stat">
+🏦 Jamg‘arma
+<b id="balance">0</b>
+</div>
+
+<div class="stat">
+🏠 Uy ishlari
+<b id="homeCount">0</b>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================================
+   YANGI: BITTADAN SAVOL
+========================================= -->
+
+<div class="card">
+
+<h2>📚 Bugungi dars</h2>
+
+<div id="lessonArea"></div>
+
+</div>
+
+
+<!-- =========================================
+   UY ISHLARI
+========================================= -->
+
+<div class="card">
+
+<h2>🏠 Bugungi uy ishlari</h2>
+
+<div id="homeList"></div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- =================================================
+OTA ONA
+================================================= -->
+
+<section id="parent" class="screen">
+
+<div class="card" id="loginBox">
+
+<h2>🔐 Ota-ona paneli</h2>
+
+
+
+<input id="pinInput"
+type="password"
+maxlength="4"
+placeholder="PIN kod">
+
+<button class="primary"
+onclick="loginParent()">
+Kirish
+</button>
+
+<div id="loginError"></div>
+
+</div>
+
+
+<div id="parentPanel" class="hidden">
+
+
+<!-- BOLA YARATISH -->
+
+<div class="card">
+
+<h2>👶 Bolalar</h2>
+
+<input id="childName"
+placeholder="Bolaning ismi">
+
+<select id="childAvatar">
+<option>👦</option>
+<option>👧</option>
+<option>🧒</option>
+</select>
+
+<button class="green"
+onclick="createChild()">
+➕ Bola qo‘shish
+</button>
+
+</div>
+
+
+<!-- =========================================
+   AVTOMATIK TOPSHIRIQLAR
+========================================= -->
+
+<div class="card">
+
+<h2>🤖 Bugungi kunni o‘zing tayyorla</h2>
+
+<div class="notice">
+
+Ota-ona faqat mavzuni tanlaydi.
+Dastur 10 ta turli topshiriqni
+o‘zi yaratadi.
+
+</div>
+
+<label>Bola</label>
+<select id="autoChild"></select>
+
+<label>Sinf</label>
+<select>
+<option>1-sinf</option>
+</select>
+
+<label>Fan</label>
+<select id="autoSubject">
+
+<option>Matematika</option>
+<option>O‘qish</option>
+<option>Ona tili</option>
+
+</select>
+
+<label>Mavzu</label>
+
+<select id="autoTopic">
+
+<option value="add10">
+10 ichida qo‘shish
+</option>
+
+<option value="sub10">
+10 ichida ayirish
+</option>
+
+<option value="compare10">
+Sonlarni taqqoslash
+</option>
+
+<option value="mixed10">
+10 ichida aralash
+</option>
+
+</select>
+
+<label>
+Har bir topshiriq balli
+</label>
+
+<input id="autoPoints"
+type="number"
+value="10">
+
+<button class="primary"
+onclick="generateToday()">
+
+🤖 10 ta topshiriq yaratish
+
+</button>
+
+<div id="generatorResult"></div>
+
+</div>
+
+
+<!-- =========================================
+   QO‘LDA TOPSHIRIQ
+========================================= -->
+
+<div class="card">
+
+<h2>✍️ O‘zingiz topshiriq qo‘shing</h2>
+
+<select id="manualChild"></select>
+
+<input id="manualSubject"
+placeholder="Fan / mavzu">
+
+<textarea id="manualQuestion"
+placeholder="Masalan: 5 + 3 = ?"></textarea>
+
+<input id="manualAnswer"
+placeholder="To‘g‘ri javob">
+
+<input id="manualPoints"
+type="number"
+value="10">
+
+<button class="primary"
+onclick="addManualLesson()">
+
+➕ Topshiriq berish
+
+</button>
+
+</div>
+
+
+<!-- =========================================
+   UY ISHI
+========================================= -->
+
+<div class="card">
+
+<h2>🏠 Uy ishi yaratish</h2>
+
+<select id="homeChild"></select>
+
+<input id="homeTitle"
+placeholder="Masalan: Xonasini tozalash">
+
+<input id="homeReward"
+type="number"
+value="1000"
+placeholder="Mukofot so‘mda">
+
+<label>
+
+<input id="dailyRepeat"
+type="checkbox">
+
+Har kuni avtomatik chiqsin
+
+</label>
+
+<br><br>
+
+<button class="green"
+onclick="addHomeWork()">
+
+➕ Uy ishini qo‘shish
+
+</button>
+
+</div>
+
+
+<!-- =========================================
+   TASDIQLASH
+========================================= -->
+
+<div class="card">
+
+<h2>✅ Tasdiqlanishi kerak</h2>
+
+<div id="pending"></div>
+
+</div>
+
+
+<!-- =========================================
+   BUGUNGI TOPSHIRIQLAR
+========================================= -->
+
+<div class="card">
+
+<h2>📋 Bugungi topshiriqlar</h2>
+
+<div id="parentLessons"></div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- =================================================
+STATISTIKA
+================================================= -->
+
+<section id="stats" class="screen">
+
+<div class="card">
+
+<h2>📊 Umumiy statistika</h2>
+
+<div class="grid">
+
+<div class="stat">
+⭐ Jami ball
+<b id="allPoints">0</b>
+</div>
+
+<div class="stat">
+💰 Jami pul
+<b id="allMoney">0</b>
+</div>
+
+<div class="stat">
+📚 Darsdan
+<b id="lessonMoney">0</b>
+</div>
+
+<div class="stat">
+🏠 Uy ishidan
+<b id="homeMoney">0</b>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>👶 Bolalar natijasi</h2>
+
+<div id="childrenStats"></div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* ================================================
+DATABASE
+================================================ */
+
+const DB="BILIM_MUKOFOT_V4";
+
+const today=
+new Date().toISOString().slice(0,10);
+
+let data;
+
+try{
+
+ data=JSON.parse(
+  localStorage.getItem(DB)
+ );
+
+}catch(e){}
+
+if(!data){
+
+ data={
+  children:[],
+  lessons:[],
+  homes:[],
+  earnings:[]
+ };
+
+}
+
+let selectedChild=
+localStorage.getItem("SELECTED_CHILD_V4")||null;
+
+
+/* ================================================
+SAQLASH
+================================================ */
+
+function save(){
+
+ localStorage.setItem(
+  DB,
+  JSON.stringify(data)
+ );
+
+}
+
+
+/* ================================================
+PUL
+================================================ */
+
+function money(n){
+
+ return new Intl.NumberFormat(
+  "uz-UZ"
+ ).format(n)+" so‘m";
+
+}
+
+
+/* ================================================
+SAHIFA
+================================================ */
+
+function openPage(id,btn){
+
+ document.querySelectorAll(".screen")
+ .forEach(x=>
+  x.classList.remove("active")
+ );
+
+ document.getElementById(id)
+ .classList.add("active");
+
+ document.querySelectorAll(".nav")
+ .forEach(x=>
+  x.classList.remove("active")
+ );
+
+ if(btn)
+  btn.classList.add("active");
+
+ refresh();
+
+}
+
+
+/* ================================================
+BOLA YARATISH
+================================================ */
+
+function createChild(){
+
+ let name=
+ document.getElementById(
+  "childName"
+ ).value.trim();
+
+ if(!name){
+
+  alert("Bolaning ismini kiriting.");
+
+  return;
+ }
+
+ let avatar=
+ document.getElementById(
+  "childAvatar"
+ ).value;
+
+ let child={
+
+  id:Date.now().toString(),
+
+  name:name,
+
+  avatar:avatar
+
+ };
+
+ data.children.push(child);
+
+ selectedChild=child.id;
+
+ localStorage.setItem(
+  "SELECTED_CHILD_V4",
+  selectedChild
+ );
+
+ save();
+
+ document.getElementById(
+  "childName"
+ ).value="";
+
+ refresh();
+
+ alert("👶 Bola yaratildi!");
+
+}
+
+
+/* ================================================
+BOLA TANLASH
+================================================ */
+
+function selectChild(id){
+
+ selectedChild=id;
+
+ localStorage.setItem(
+  "SELECTED_CHILD_V4",
+  id
+ );
+
+ /* yangi sessiya */
+ lessonSession=null;
+
+ refresh();
+
+}
+
+
+/* ================================================
+BOLALAR RO‘YXATI
+================================================ */
+
+function renderChildren(){
+
+ let box=
+ document.getElementById(
+  "childrenList"
+ );
+
+ if(!data.children.length){
+
+  box.innerHTML=`
+
+  <div class="notice">
+
+  Hali bola qo‘shilmagan.
+
+  Ota-ona panelidan bola qo‘shing.
+
+  </div>
+
+  `;
+
+  document.getElementById(
+   "childPanel"
+  ).classList.add("hidden");
+
+  return;
+ }
+
+
+ if(
+  !selectedChild ||
+  !data.children.some(
+   x=>x.id===selectedChild
+  )
+ ){
+
+  selectedChild=
+  data.children[0].id;
+
+ }
+
+
+ box.innerHTML=
+ data.children.map(c=>`
+
+ <div class="profile
+ ${c.id===selectedChild?"selected":""}"
+
+ onclick="selectChild('${c.id}')">
+
+ <div class="avatar">
+ ${c.avatar}
+ </div>
+
+ <div>
+
+ <h3>${c.name}</h3>
+
+ ${
+  c.id===selectedChild
+  ?"✅ Tanlangan"
+  :"Tanlash uchun bosing"
+ }
+
+ </div>
+
+ </div>
+
+ `).join("");
+
+
+ let c=data.children.find(
+  x=>x.id===selectedChild
+ );
+
+ if(c){
+
+  document.getElementById(
+   "headerChild"
+  ).textContent=c.name;
+
+  document.getElementById(
+   "childPanel"
+  ).classList.remove("hidden");
+
+ }
+
+}
+
+
+/* ================================================
+SELECTLAR
+================================================ */
+
+function fillSelect(id){
+
+ let el=
+ document.getElementById(id);
+
+ if(!el)return;
+
+ let old=el.value;
+
+ el.innerHTML=
+ data.children.map(c=>`
+
+ <option value="${c.id}">
+ ${c.avatar} ${c.name}
+ </option>
+
+ `).join("");
+
+ if(
+  old &&
+  data.children.some(
+   c=>c.id===old
+  )
+ )
+ el.value=old;
+
+}
+
+
+/* ================================================
+RANDOM
+================================================ */
+
+function random(a,b){
+
+ return Math.floor(
+  Math.random()*(b-a+1)
+ )+a;
+
+}
+
+
+/* ================================================
+TOPSHIRIQ YARATISH
+================================================ */
+
+function makeTask(topic){
+
+ let q="";
+ let answer="";
+
+ if(topic==="add10"){
+
+  let a=random(0,9);
+
+  let b=random(0,10-a);
+
+  q=`${a} + ${b} = ?`;
+
+  answer=String(a+b);
+
+ }
+
+ else if(topic==="sub10"){
+
+  let a=random(1,10);
+
+  let b=random(0,a);
+
+  q=`${a} − ${b} = ?`;
+
+  answer=String(a-b);
+
+ }
+
+ else if(topic==="compare10"){
+
+  let a=random(0,10);
+
+  let b=random(0,10);
+
+  q=`${a}  □  ${b}`;
+
+  answer=
+   a>b ? ">" :
+   a<b ? "<" : "=";
+
+ }
+
+ else{
+
+  let type=random(1,4);
+
+  if(type===1){
+
+   let a=random(0,8);
+
+   let b=random(0,10-a);
+
+   q=`${a} + ${b} = ?`;
+
+   answer=String(a+b);
+
+  }
+
+  else if(type===2){
+
+   let a=random(1,10);
+
+   let b=random(0,a);
+
+   q=`${a} − ${b} = ?`;
+
+   answer=String(a-b);
+
+  }
+
+  else if(type===3){
+
+   let a=random(0,10);
+
+   let b=random(0,10);
+
+   q=`${a} □ ${b}`;
+
+   answer=
+    a>b?">":
+    a<b?"<":"=";
+
+  }
+
+  else{
+
+   let a=random(1,5);
+
+   let b=random(1,5);
+
+   q=
+   `Ali ${a} ta olma oldi.
+   Onasi yana ${b} ta berdi.
+   Jami nechta olma bo‘ldi?`;
+
+   answer=String(a+b);
+
+  }
+
+ }
+
+ return {
+  q:q,
+  answer:answer
+ };
+
+}
+
+
+/* ================================================
+BUGUNGI 10 TA TOPSHIRIQ
+================================================ */
+
+function generateToday(){
+
+ let child=
+ document.getElementById(
+  "autoChild"
+ ).value;
+
+ let topic=
+ document.getElementById(
+  "autoTopic"
+ ).value;
+
+ let subject=
+ document.getElementById(
+  "autoSubject"
+ ).value;
+
+ let points=parseInt(
+  document.getElementById(
+   "autoPoints"
+  ).value
+ )||10;
+
+
+ if(!child){
+
+  alert("Avval bola yarating.");
+
+  return;
+
+ }
+
+
+ /* bir kunda 10 tadan oshirmaymiz */
+
+ let existing=data.lessons.filter(
+  x=>
+   x.child===child &&
+   x.date===today
+ );
+
+ let remaining=
+ Math.max(0,10-existing.length);
+
+ if(remaining===0){
+
+  alert(
+   "⚠️ Bu bola uchun bugungi 10 ta topshiriq allaqachon berilgan."
+  );
+
+  return;
+ }
+
+
+ let count=0;
+
+ let attempts=0;
+
+ while(
+  count<remaining &&
+  attempts<200
+ ){
+
+  attempts++;
+
+  let task=
+   makeTask(topic);
+
+  let exists=
+   data.lessons.some(x=>
+
+    x.child===child &&
+    x.date===today &&
+    x.question===task.q
+
+   );
+
+  if(exists)
+   continue;
+
+
+  data.lessons.push({
+
+   id:
+    Date.now().toString()+
+    "_" + Math.random(),
+
+   child:child,
+
+   date:today,
+
+   subject:subject,
+
+   question:task.q,
+
+   answer:task.answer,
+
+   points:points,
+
+   source:"auto",
+
+   done:false,
+
+   result:null
+
+  });
+
+  count++;
+
+ }
+
+
+ save();
+
+
+ document.getElementById(
+  "generatorResult"
+ ).innerHTML=`
+
+ <p class="success">
+
+ ✅ ${count} ta yangi topshiriq yaratildi!
+
+ </p>
+
+ `;
+
+ refresh();
+
+}
+
+
+/* ================================================
+QO‘LDA TOPSHIRIQ
+================================================ */
+
+function addManualLesson(){
+
+ let child=
+ document.getElementById(
+  "manualChild"
+ ).value;
+
+ let subject=
+ document.getElementById(
+  "manualSubject"
+ ).value.trim()
+ ||"Umumiy";
+
+ let q=
+ document.getElementById(
+  "manualQuestion"
+ ).value.trim();
+
+ let answer=
+ document.getElementById(
+  "manualAnswer"
+ ).value.trim();
+
+ let points=parseInt(
+  document.getElementById(
+   "manualPoints"
+  ).value
+ )||10;
+
+
+ if(!q||!answer){
+
+  alert(
+   "Topshiriq va to‘g‘ri javobni kiriting."
+  );
+
+  return;
+
+ }
+
+
+ let todayCount=
+ data.lessons.filter(x=>
+
+  x.child===child &&
+  x.date===today
+
+ ).length;
+
+
+ if(todayCount>=10){
+
+  alert(
+   "⚠️ Bir kunda 10 tadan ortiq dars topshirig‘i berilmaydi."
+  );
+
+  return;
+
+ }
+
+
+ data.lessons.push({
+
+  id:
+   Date.now().toString(),
+
+  child:child,
+
+  date:today,
+
+  subject:subject,
+
+  question:q,
+
+  answer:answer,
+
+  points:points,
+
+  source:"manual",
+
+  done:false,
+
+  result:null
+
+ });
+
+
+ save();
+
+ document.getElementById(
+  "manualQuestion"
+ ).value="";
+
+ document.getElementById(
+  "manualAnswer"
+ ).value="";
+
+ refresh();
+
+ alert("📚 Topshiriq berildi!");
+
+}
+
+
+/* ================================================
+MUHIM:
+BOLA SAVOL SESSIYASI
+================================================ */
+
+let lessonSession=null;
+
+
+/*
+lessonSession:
+
+{
+ list:[],
+ index:0,
+ correct:0,
+ points:0,
+ answers:[]
+}
+
+*/
+
+
+function startLesson(){
+
+ if(!selectedChild)
+  return;
+
+
+ let list=
+ data.lessons.filter(x=>
+
+  x.child===selectedChild &&
+  x.date===today
+
+ );
+
+
+ /*
+ Agar bugungi topshiriqlar tugagan bo‘lsa
+ */
+
+ if(!list.length){
+
+  document.getElementById(
+   "lessonArea"
+  ).innerHTML=`
+
+  <div class="notice">
+
+  📚 Bugun uchun topshiriq yo‘q.
+
+  Ota-ona topshiriq bersa,
+  shu yerda paydo bo‘ladi.
+
+  </div>
+
+  `;
+
+  return;
+
+ }
+
+
+ /*
+ Bajarilmaganlarini olamiz
+ */
+
+ let remaining=
+ list.filter(x=>!x.done);
+
+
+ if(!remaining.length){
+
+  showFinalResult(list);
+
+  return;
+
+ }
+
+
+ lessonSession={
+
+  list:remaining,
+
+  index:0,
+
+  correct:0,
+
+  points:0,
+
+  answers:[]
+
+ };
+
+
+ renderCurrentQuestion();
+
+}
+
+
+/* ================================================
+JORIY SAVOL
+================================================ */
+
+function renderCurrentQuestion(){
+
+ if(!lessonSession)
+  return;
+
+
+ let total=
+ lessonSession.list.length;
+
+ let index=
+ lessonSession.index;
+
+ let t=
+ lessonSession.list[index];
+
+
+ let percent=
+ (index/total)*100;
+
+
+ document.getElementById(
+  "lessonArea"
+ ).innerHTML=`
+
+ <div class="questionBox">
+
+ <div class="questionNumber">
+
+ 📚 ${index+1} / ${total}
+
+ </div>
+
+ <div class="progress">
+
+ <div style="width:${percent}%"></div>
+
+ </div>
+
+ <div class="questionText">
+
+ ${t.question}
+
+ </div>
+
+ <input
+
+ id="currentAnswer"
+
+ class="answerInput"
+
+ autocomplete="off"
+
+ placeholder="Javobingiz">
+
+ <button
+
+ class="primary nextButton"
+
+ onclick="nextQuestion()">
+
+ ${
+  index===total-1
+  ?"🏁 Tugatish"
+  :"Keyingi ➜"
+ }
+
+ </button>
+
+ </div>
+
+ `;
+
+
+ document.getElementById(
+  "currentAnswer"
+ ).focus();
+
+
+ /*
+ Enter tugmasi ham Keyingi bo‘lsin
+ */
+
+ document.getElementById(
+  "currentAnswer"
+ ).addEventListener(
+  "keydown",
+  function(e){
+
+   if(e.key==="Enter"){
+
+    e.preventDefault();
+
+    nextQuestion();
+
+   }
+
+  }
+ );
+
+}
+
+
+/* ================================================
+KEYINGI SAVOL
+================================================ */
+
+function nextQuestion(){
+
+ if(!lessonSession)
+  return;
+
+
+ let input=
+ document.getElementById(
+  "currentAnswer"
+ );
+
+ if(!input)
+  return;
+
+
+ let answer=
+ input.value.trim();
+
+
+ if(!answer){
+
+  alert(
+   "✏️ Avval javobingizni yozing."
+  );
+
+  input.focus();
+
+  return;
+
+ }
+
+
+ let t=
+ lessonSession.list[
+  lessonSession.index
+ ];
+
+
+ let correct=
+ answer.toLowerCase()===
+ t.answer.toLowerCase();
+
+
+ /*
+ NATIJANI HOZIRCHA EKRANGA
+ CHIQARMAYMIZ
+ */
+
+ lessonSession.answers.push({
+
+  taskId:t.id,
+
+  answer:answer,
+
+  correct:correct
+
+ });
+
+
+ if(correct){
+
+  lessonSession.correct++;
+
+  lessonSession.points+=
+   Number(t.points)||0;
+
+ }
+
+
+ lessonSession.index++;
+
+
+ if(
+  lessonSession.index>=
+  lessonSession.list.length
+ ){
+
+  finishLesson();
+
+ }else{
+
+  renderCurrentQuestion();
+
+ }
+
+}
+
+
+/* ================================================
+10 TA TUGAGACH
+================================================ */
+
+function finishLesson(){
+
+ if(!lessonSession)
+  return;
+
+
+ /*
+ Natijalarni databasega yozamiz
+ */
+
+ lessonSession.answers.forEach(a=>{
+
+  let t=data.lessons.find(
+   x=>x.id===a.taskId
+  );
+
+  if(!t)return;
+
+  t.done=true;
+
+  t.result=
+   a.correct
+   ?"correct"
+   :"wrong";
+
+ });
+
+
+ /*
+ To‘g‘ri javoblar uchun pul
+ */
+
+ let earningPoints=
+  lessonSession.points;
+
+
+ let earningMoney=
+  earningPoints*100;
+
+
+ if(earningPoints>0){
+
+  data.earnings.push({
+
+   id:Date.now().toString(),
+
+   child:selectedChild,
+
+   type:"lesson",
+
+   amount:earningMoney,
+
+   points:earningPoints,
+
+   title:"Bugungi dars",
+
+   date:today
+
+  });
+
+ }
+
+
+ save();
+
+
+ showFinalResult(
+  data.lessons.filter(x=>
+   x.child===selectedChild &&
+   x.date===today
+  )
+ );
+
+
+ lessonSession=null;
+
+ refreshStatsOnly();
+
+}
+
+
+/* ================================================
+YAKUNIY NATIJA
+================================================ */
+
+function showFinalResult(list){
+
+ let correct=
+  list.filter(
+   x=>x.result==="correct"
+  ).length;
+
+
+ let total=list.length;
+
+
+ let points=
+  list
+  .filter(x=>x.result==="correct")
+  .reduce(
+   (s,x)=>s+(Number(x.points)||0),
+   0
+  );
+
+
+ /*
+ Bugungi dars uchun avval berilgan
+ earningni olish
+ */
+
+ let lessonEarn=
+  data.earnings
+  .filter(x=>
+   x.child===selectedChild &&
+   x.date===today &&
+   x.type==="lesson"
+  )
+  .reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ document.getElementById(
+  "lessonArea"
+ ).innerHTML=`
+
+ <div class="bigResult">
+
+ <div style="font-size:55px">
+ 🎉
+ </div>
+
+ <h2>
+ Bugungi topshiriqlar tugadi!
+ </h2>
+
+ <div class="resultNumber">
+
+ ${correct} / ${total}
+
+ </div>
+
+ <p>
+ To‘g‘ri javoblar
+ </p>
+
+ <div class="starResult">
+
+ ⭐ ${points} ball
+
+ </div>
+
+ <div class="moneyResult">
+
+ 💰 ${money(lessonEarn)}
+
+ </div>
+
+ ${
+  correct===total
+
+  ?
+
+  `<p class="success">
+  🏆 Ajoyib! Hammasini to‘g‘ri bajardingiz!
+  </p>`
+
+  :
+
+  correct>=total/2
+
+  ?
+
+  `<p>
+  👍 Juda yaxshi!
+  Yana mashq qilsangiz yanada yaxshi bo‘ladi.
+  </p>`
+
+  :
+
+  `<p>
+  💪 Harakat qilishda davom eting!
+  </p>`
+
+ }
+
+ </div>
+
+ `;
+
+}
+
+
+/* ================================================
+UY ISHI
+================================================ */
+
+function addHomeWork(){
+
+ let child=
+ document.getElementById(
+  "homeChild"
+ ).value;
+
+ let title=
+ document.getElementById(
+  "homeTitle"
+ ).value.trim();
+
+ let reward=parseInt(
+  document.getElementById(
+   "homeReward"
+  ).value
+ )||0;
+
+ let repeat=
+ document.getElementById(
+  "dailyRepeat"
+ ).checked;
+
+
+ if(!title||reward<=0){
+
+  alert(
+   "Uy ishini to‘liq kiriting."
+  );
+
+  return;
+
+ }
+
+
+ data.homes.push({
+
+  id:Date.now().toString(),
+
+  child:child,
+
+  title:title,
+
+  reward:reward,
+
+  repeat:repeat,
+
+  date:today,
+
+  status:"waiting"
+
+ });
+
+
+ save();
+
+ document.getElementById(
+  "homeTitle"
+ ).value="";
+
+ refresh();
+
+ alert(
+  repeat
+  ?"🔄 Har kuni bajariladigan ish qo‘shildi!"
+  :"🏠 Bugungi ish qo‘shildi!"
+ );
+
+}
+
+
+/* ================================================
+UY ISHLARI
+================================================ */
+
+function renderHome(){
+
+ let box=
+ document.getElementById(
+  "homeList"
+ );
+
+ if(!selectedChild){
+
+  box.innerHTML="";
+
+  return;
+
+ }
+
+
+ let list=
+ data.homes.filter(x=>
+
+  x.child===selectedChild &&
+  (
+   x.date===today ||
+   x.repeat
+  )
+
+ );
+
+
+ if(!list.length){
+
+  box.innerHTML=`
+
+  <div class="notice">
+
+  Bugun uy ishi yo‘q.
+
+  </div>
+
+  `;
+
+  return;
+
+ }
+
+
+ box.innerHTML=
+ list.map(t=>`
+
+ <div class="task">
+
+ <h3>
+ 🏠 ${t.title}
+ </h3>
+
+ <p class="reward">
+ 💰 ${money(t.reward)}
+ </p>
+
+ ${
+  t.status==="waiting"
+
+  ?
+
+  `<button
+   class="green"
+   onclick="claimHome('${t.id}')">
+
+   ✅ Bajardim
+
+   </button>`
+
+  :
+
+  t.status==="claimed"
+
+  ?
+
+  `<span class="badge">
+   ⏳ Ota-ona tasdig‘i kutilmoqda
+   </span>`
+
+  :
+
+  t.status==="approved"
+
+  ?
+
+  `<span class="badge">
+   💰 Tasdiqlandi
+   </span>`
+
+  :
+
+  `<span class="badge">
+   ❌ Rad etildi
+   </span>`
+
+ }
+
+ </div>
+
+ `).join("");
+
+}
+
+
+/* ================================================
+UY ISHINI BAJARDIM
+================================================ */
+
+function claimHome(id){
+
+ let t=data.homes.find(
+  x=>x.id===id
+ );
+
+ if(!t)return;
+
+ t.status="claimed";
+
+ save();
+
+ refresh();
+
+ alert(
+  "👍 Ota-onaga yuborildi!"
+ );
+
+}
+
+
+/* ================================================
+OTA ONA TASDIQLASH
+================================================ */
+
+function renderPending(){
+
+ let box=
+ document.getElementById(
+  "pending"
+ );
+
+ let list=
+ data.homes.filter(
+  x=>x.status==="claimed"
+ );
+
+
+ if(!list.length){
+
+  box.innerHTML=`
+
+  <div class="notice">
+  Tasdiqlanadigan ish yo‘q.
+  </div>
+
+  `;
+
+  return;
+
+ }
+
+
+ box.innerHTML=
+ list.map(t=>{
+
+  let c=
+   data.children.find(
+    x=>x.id===t.child
+   );
+
+  return `
+
+  <div class="task">
+
+  <h3>
+  ${c?.avatar||"👦"}
+  ${c?.name||"Bola"}
+  </h3>
+
+  <p>
+  🏠 ${t.title}
+  </p>
+
+  <p class="reward">
+  💰 ${money(t.reward)}
+  </p>
+
+  <button
+  class="green"
+  onclick="approveHome('${t.id}')">
+
+  ✅ To‘liq
+
+  </button>
+
+  <button
+  class="orange"
+  onclick="partialHome('${t.id}')">
+
+  🟡 Qisman
+
+  </button>
+
+  <button
+  class="red"
+  onclick="rejectHome('${t.id}')">
+
+  ❌ Rad etish
+
+  </button>
+
+  </div>
+
+  `;
+
+ }).join("");
+
+}
+
+
+/* ================================================
+UY ISHI TASDIQ
+================================================ */
+
+function approveHome(id){
+
+ let t=
+  data.homes.find(
+   x=>x.id===id
+  );
+
+ if(!t)return;
+
+ t.status="approved";
+
+ addEarning(
+  t.child,
+  "home",
+  t.reward,
+  0,
+  t.title
+ );
+
+ save();
+
+ refresh();
+
+}
+
+
+function partialHome(id){
+
+ let t=
+  data.homes.find(
+   x=>x.id===id
+  );
+
+ if(!t)return;
+
+ t.status="approved";
+
+ let amount=
+  Math.floor(t.reward/2);
+
+ addEarning(
+  t.child,
+  "home",
+  amount,
+  0,
+  t.title+" (qisman)"
+ );
+
+ save();
+
+ refresh();
+
+}
+
+
+function rejectHome(id){
+
+ let t=
+  data.homes.find(
+   x=>x.id===id
+  );
+
+ if(!t)return;
+
+ t.status="rejected";
+
+ save();
+
+ refresh();
+
+}
+
+
+/* ================================================
+DAROMAD
+================================================ */
+
+function addEarning(
+ child,
+ type,
+ amount,
+ points,
+ title
+){
+
+ data.earnings.push({
+
+  id:Date.now().toString(),
+
+  child:child,
+
+  type:type,
+
+  amount:amount,
+
+  points:points,
+
+  title:title,
+
+  date:today
+
+ });
+
+}
+
+
+/* ================================================
+BOLA STATISTIKA
+================================================ */
+
+function renderChildStats(){
+
+ if(!selectedChild)return;
+
+ let todayE=
+  data.earnings.filter(
+   x=>
+    x.child===selectedChild &&
+    x.date===today
+  );
+
+
+ let total=
+  todayE.reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ let points=
+  todayE.reduce(
+   (s,x)=>s+(x.points||0),
+   0
+  );
+
+
+ let balance=
+  data.earnings
+  .filter(
+   x=>x.child===selectedChild
+  )
+  .reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ document.getElementById(
+  "todayPoints"
+ ).textContent=points;
+
+
+ document.getElementById(
+  "todayMoney"
+ ).textContent=
+  money(total);
+
+
+ document.getElementById(
+  "balance"
+ ).textContent=
+  money(balance);
+
+
+ document.getElementById(
+  "homeCount"
+ ).textContent=
+  data.homes.filter(x=>
+   x.child===selectedChild &&
+   (
+    x.repeat ||
+    x.date===today
+   )
+  ).length;
+
+}
+
+
+/* ================================================
+OTA ONA TOPSHIRIQLARI
+================================================ */
+
+function renderParentLessons(){
+
+ let box=
+  document.getElementById(
+   "parentLessons"
+  );
+
+ let list=
+  data.lessons.filter(
+   x=>x.date===today
+  );
+
+
+ if(!list.length){
+
+  box.innerHTML=`
+
+  <div class="notice">
+  Bugun topshiriqlar yo‘q.
+  </div>
+
+  `;
+
+  return;
+
+ }
+
+
+ box.innerHTML=
+ list.map(t=>{
+
+  let c=
+   data.children.find(
+    x=>x.id===t.child
+   );
+
+  return `
+
+  <div class="task">
+
+  <b>
+  ${c?.avatar||"👦"}
+  ${c?.name||"Bola"}
+  </b>
+
+  <p>
+  📚 ${t.subject}
+  </p>
+
+  <p>
+  ${t.question}
+  </p>
+
+  <span class="badge">
+  ⭐ ${t.points} ball
+  </span>
+
+  ${
+   t.done
+
+   ?
+
+   `<span class="badge">
+
+   ${
+    t.result==="correct"
+    ?"✅ To‘g‘ri"
+    :"❌ Noto‘g‘ri"
+   }
+
+   </span>`
+
+   :
+
+   `<span class="badge">
+   ⏳ Bajarilmagan
+   </span>`
+
+  }
+
+  </div>
+
+  `;
+
+ }).join("");
+
+}
+
+
+/* ================================================
+STATISTIKA
+================================================ */
+
+function renderStats(){
+
+ let all=
+  data.earnings.reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ let lesson=
+  data.earnings
+  .filter(x=>x.type==="lesson")
+  .reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ let home=
+  data.earnings
+  .filter(x=>x.type==="home")
+  .reduce(
+   (s,x)=>s+x.amount,
+   0
+  );
+
+
+ let points=
+  data.earnings.reduce(
+   (s,x)=>s+(x.points||0),
+   0
+  );
+
+
+ document.getElementById(
+  "allPoints"
+ ).textContent=points;
+
+
+ document.getElementById(
+  "allMoney"
+ ).textContent=money(all);
+
+
+ document.getElementById(
+  "lessonMoney"
+ ).textContent=money(lesson);
+
+
+ document.getElementById(
+  "homeMoney"
+ ).textContent=money(home);
+
+
+ document.getElementById(
+  "childrenStats"
+ ).innerHTML=
+
+ data.children.map(c=>{
+
+  let total=
+   data.earnings
+   .filter(
+    x=>x.child===c.id
+   )
+   .reduce(
+    (s,x)=>s+x.amount,
+    0
+   );
+
+
+  let pts=
+   data.earnings
+   .filter(
+    x=>x.child===c.id
+   )
+   .reduce(
+    (s,x)=>s+(x.points||0),
+    0
+   );
+
+
+  return `
+
+  <div class="task">
+
+  <h3>
+  ${c.avatar} ${c.name}
+  </h3>
+
+  <p>
+  ⭐ Ball:
+  <b>${pts}</b>
+  </p>
+
+  <p>
+  💰 Jamg‘arma:
+  <b>${money(total)}</b>
+  </p>
+
+  </div>
+
+  `;
+
+ }).join("");
+
+}
+
+
+/* ================================================
+LOGIN
+================================================ */
+
+function loginParent(){
+
+ let pin=
+  document.getElementById(
+   "pinInput"
+  ).value;
+
+
+ if(pin==="1234"){
+
+  document.getElementById(
+   "loginBox"
+  ).classList.add("hidden");
+
+
+  document.getElementById(
+   "parentPanel"
+  ).classList.remove("hidden");
+
+
+  refresh();
+
+ }else{
+
+  document.getElementById(
+   "loginError"
+  ).innerHTML=
+
+  `<p class="error">
+   ❌ PIN noto‘g‘ri
+   </p>`;
+
+ }
+
+}
+
+
+/* ================================================
+STATISTIKANI YANGILASH
+================================================ */
+
+function refreshStatsOnly(){
+
+ renderChildStats();
+ renderStats();
+ renderParentLessons();
+
+}
+
+
+/* ================================================
+UMUMIY REFRESH
+================================================ */
+
+function refresh(){
+
+ renderChildren();
+
+ fillSelect("autoChild");
+ fillSelect("manualChild");
+ fillSelect("homeChild");
+
+ /*
+  MUHIM:
+  Bola tanlanganda eski savol sessiyasini
+  qayta yaratmaymiz.
+ */
+
+ if(!lessonSession){
+
+  startLesson();
+
+ }
+
+ renderHome();
+
+ renderChildStats();
+
+ renderPending();
+
+ renderParentLessons();
+
+ renderStats();
+
+}
+
+
+/* ================================================
+START
+================================================ */
+
+refresh();
+
+</script>
+
+</body>
+</html>
