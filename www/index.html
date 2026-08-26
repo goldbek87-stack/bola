@@ -339,10 +339,13 @@ function load(){try{return JSON.parse(localStorage.getItem(DBKEY))||defaults()}c
 function save(){localStorage.setItem(DBKEY,JSON.stringify(data));syncPush()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function money(n){return new Intl.NumberFormat("uz-UZ").format(Number(n)||0)+" so‘m"}
-function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function id(){
+ if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();
+ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{let r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16)})
+}
 function childById(cid){return data.children.find(x=>x.id===cid)}
 function currentChild(){return childById(session.userId)}
-function statFor(c,sub){c.stats=c.stats||{};c.stats[sub]=c.stats[sub]||{level:1,answered:0,correct:0,streak:0,last:""};return c.stats[sub]}
+function statFor(c,sub){c.stats=c.stats||{};c.stats[sub]=c.stats[sub]||{level:Math.max(1,Math.min(10,Number(c.grade)||1)),answered:0,correct:0,streak:0,last:""};return c.stats[sub]}
 function addActivity(cid,type,title,points=0,moneyAmt=0,meta={}){
  data.activity.push({id:id(),child:cid,type,title,points,money:moneyAmt,date:today(),ts:Date.now(),...meta});save()
 }
@@ -1025,6 +1028,19 @@ function changeParentPin(){let p=newParentPin.value.trim();if(!/^\d{4}$/.test(p)
 function backup(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="bilim_ustoz_backup.json";a.click();URL.revokeObjectURL(u)}
 function restoreBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Backup tiklandi.");refreshParent()}catch(err){alert("Backup fayli noto‘g‘ri.")}};r.readAsText(f)}
 function resetAll(){if(confirm("Haqiqatan ham barcha ma’lumotlarni o‘chirasizmi?")){localStorage.removeItem(DBKEY);data=defaults();logout()}}
+
+// ============ AVTOMATIK KIRISH (agar oldin login qilingan bo'lsa) ============
+(async function initSession(){
+ try{
+  let {data:{session:s}}=await sb.auth.getSession();
+  if(s&&s.user){
+   currentParentId=s.user.id;
+   await pullFromSupabase(currentParentId);
+   session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
+   openApp();
+  }
+ }catch(e){console.error("Sessiyani tekshirishda xato:",e)}
+})();
 </script>
 </body>
 </html>
