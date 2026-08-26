@@ -270,11 +270,52 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
 </section>
 <div class="appBottomSpace"></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const DBKEY="BILIM_USTOZ_V9";
 const today=()=>new Date().toISOString().slice(0,10);
 let data=load();
 let session={role:null,userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
+
+// ============ SUPABASE ULANISH ============
+const SUPABASE_URL="https://hnyjnsmuonfynosxltlo.supabase.co";
+const SUPABASE_KEY="sb_publishable_hyx7aHhjECTIUWIB6cR8aw_k2JMVJVC";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentParentId=null;
+let syncTimer=null;
+function syncPush(){clearTimeout(syncTimer);syncTimer=setTimeout(doSyncPush,800)}
+async function doSyncPush(){
+ try{
+  if(session.role==="parent"&&currentParentId){
+   for(const c of data.children){await sb.from("children").upsert({id:c.id,parent_id:currentParentId,name:c.name,avatar:c.avatar,grade:c.grade,pin:c.pin,point_rate:c.pointRate,note:c.note,stats:c.stats||{}})}
+   for(const a of data.assignments){await sb.from("assignments").upsert({id:a.id,child_id:a.child,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status})}
+   for(const h of data.homes){await sb.from("homes").upsert({id:h.id,child_id:h.child,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status})}
+   for(const act of data.activity){await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts})}
+  }else if(session.role==="child"&&session.userId){
+   let cid=session.userId;
+   for(const a of data.assignments.filter(x=>x.child===cid)){await sb.from("assignments").update({status:a.status}).eq("id",a.id)}
+   for(const h of data.homes.filter(x=>x.child===cid)){await sb.from("homes").update({status:h.status}).eq("id",h.id)}
+   for(const act of data.activity.filter(x=>x.child===cid)){await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts})}
+  }
+ }catch(e){console.error("Supabase sync xatosi:",e)}
+}
+async function pullFromSupabase(parentId){
+ try{
+  let {data:children,error}=await sb.from("children").select("*").eq("parent_id",parentId);
+  if(error)throw error;
+  data.children=(children||[]).map(c=>({id:c.id,name:c.name,avatar:c.avatar||"👦",grade:c.grade||1,pin:c.pin||"0000",pointRate:c.point_rate||100,note:c.note||"",stats:c.stats||{},created:new Date(c.created_at).getTime()}));
+  let childIds=data.children.map(c=>c.id);
+  if(childIds.length){
+   let {data:assigns}=await sb.from("assignments").select("*").in("child_id",childIds);
+   data.assignments=(assigns||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,created:new Date(a.created_at).getTime()}));
+   let {data:homesRows}=await sb.from("homes").select("*").in("child_id",childIds);
+   data.homes=(homesRows||[]).map(h=>({id:h.id,child:h.child_id,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status}));
+   let {data:activityRows}=await sb.from("activity").select("*").in("child_id",childIds).order("ts",{ascending:true});
+   data.activity=(activityRows||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,title:a.title,points:a.points,money:a.money,date:a.date,ts:a.ts}));
+  }else{data.assignments=[];data.homes=[];data.activity=[]}
+  localStorage.setItem(DBKEY,JSON.stringify(data))
+ }catch(e){console.error("Supabase yuklash xatosi:",e);alert("Internetga ulanishda xato. Offline rejimda davom etyapmiz.")}
+}
 
 function defaults(){
  return {
@@ -287,7 +328,7 @@ function defaults(){
  };
 }
 function load(){try{return JSON.parse(localStorage.getItem(DBKEY))||defaults()}catch(e){return defaults()}}
-function save(){localStorage.setItem(DBKEY,JSON.stringify(data))}
+function save(){localStorage.setItem(DBKEY,JSON.stringify(data));syncPush()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function money(n){return new Intl.NumberFormat("uz-UZ").format(Number(n)||0)+" so‘m"}
 function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -305,15 +346,32 @@ function activateNav(btn){
  document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active")); if(btn)btn.classList.add("active")
 }
 function showParentLogin(){
- document.getElementById("loginArea").innerHTML=`<h3>👨‍👩‍👧 Ota-ona PIN</h3><input id="parentLoginPin" type="password" maxlength="4" placeholder="PIN"><button class="primary" onclick="parentLogin()">Kirish</button><div id="loginErr"></div>`
+ document.getElementById("loginArea").innerHTML=`<h3>👨‍👩‍👧 Ota-ona</h3><input id="parentEmail" type="email" placeholder="Email"><input id="parentPassword" type="password" placeholder="Parol (kamida 6 belgi)"><div class="row"><button class="primary" onclick="parentLogin()">Kirish</button><button class="gray" onclick="parentSignup()">Ro‘yxatdan o‘tish</button></div><div id="loginErr"></div>`
 }
 function showChildLogin(){
  let opts=data.children.map(c=>`<option value="${c.id}">${c.avatar} ${esc(c.name)}</option>`).join("");
  document.getElementById("loginArea").innerHTML=`<h3>🧒 Bola kirishi</h3>${opts?`<select id="childLoginSelect">${opts}</select><input id="childLoginPin" type="password" maxlength="4" placeholder="Bola PIN"><button class="green" onclick="childLogin()">Kirish</button>`:`<div class="notice">Avval ota-ona profil yaratishi kerak.</div>`}<div id="loginErr"></div>`
 }
-function parentLogin(){
- let p=document.getElementById("parentLoginPin").value;
- if(p!==data.parentPin){document.getElementById("loginErr").innerHTML='<p class="error">PIN noto‘g‘ri</p>';return}
+async function parentLogin(){
+ let email=document.getElementById("parentEmail").value.trim(),password=document.getElementById("parentPassword").value;
+ if(!email||!password){document.getElementById("loginErr").innerHTML='<p class="error">Email va parolni kiriting.</p>';return}
+ document.getElementById("loginErr").innerHTML='<p class="muted">Kirilmoqda...</p>';
+ let {data:authData,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
+ currentParentId=authData.user.id;
+ document.getElementById("loginErr").innerHTML='<p class="muted">Ma’lumotlar yuklanmoqda...</p>';
+ await pullFromSupabase(currentParentId);
+ session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
+}
+async function parentSignup(){
+ let email=document.getElementById("parentEmail").value.trim(),password=document.getElementById("parentPassword").value;
+ if(!email||password.length<6){document.getElementById("loginErr").innerHTML='<p class="error">Email va kamida 6 belgili parol kiriting.</p>';return}
+ document.getElementById("loginErr").innerHTML='<p class="muted">Ro‘yxatdan o‘tilmoqda...</p>';
+ let {data:authData,error}=await sb.auth.signUp({email,password});
+ if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
+ if(!authData.session){document.getElementById("loginErr").innerHTML='<p class="success">Ro‘yxatdan o‘tdingiz! Endi "Kirish" tugmasi orqali kiring.</p>';return}
+ currentParentId=authData.user.id;
+ await pullFromSupabase(currentParentId);
  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
 function childLogin(){
@@ -322,6 +380,7 @@ function childLogin(){
  session={role:"child",userId:cid,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
 function logout(){
+ if(session.role==="parent"){sb.auth.signOut();currentParentId=null}
  session={role:null,userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
  document.getElementById("appScreen").classList.remove("active");document.getElementById("loginScreen").classList.add("active");document.getElementById("loginArea").innerHTML=""
 }
