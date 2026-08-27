@@ -292,6 +292,9 @@ const SUPABASE_URL="https://hnyjnsmuonfynosxltlo.supabase.co";
 const SUPABASE_KEY="sb_publishable_hyx7aHhjECTIUWIB6cR8aw_k2JMVJVC";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentParentId=null;
+async function ensureParentRow(uid){
+ try{let r=await sb.from("parents").upsert({id:uid});if(r.error)console.error("parents upsert xato:",r.error)}catch(e){console.error(e)}
+}
 function syncPush(){doSyncPush()}
 async function doSyncPush(){
  try{
@@ -381,6 +384,7 @@ async function parentLogin(){
  if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
  currentParentId=authData.user.id;
  document.getElementById("loginErr").innerHTML='<p class="muted">Ma’lumotlar yuklanmoqda...</p>';
+ await ensureParentRow(currentParentId);
  await pullFromSupabase(currentParentId);
  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
@@ -392,6 +396,7 @@ async function parentSignup(){
  if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
  if(!authData.session){document.getElementById("loginErr").innerHTML='<p class="success">Ro‘yxatdan o‘tdingiz! Endi "Kirish" tugmasi orqali kiring.</p>';return}
  currentParentId=authData.user.id;
+ await ensureParentRow(currentParentId);
  await pullFromSupabase(currentParentId);
  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
@@ -1115,6 +1120,7 @@ function resetAll(){if(confirm("Haqiqatan ham barcha ma’lumotlarni o‘chirasi
   let {data:{session:s}}=await sb.auth.getSession();
   if(s&&s.user){
    currentParentId=s.user.id;
+   await ensureParentRow(currentParentId);
    await pullFromSupabase(currentParentId);
    session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
    openApp();
