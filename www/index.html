@@ -214,6 +214,13 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
   <button class="green" onclick="generateAIAssignment()">✨ AI yordamida yaratish</button>
   <div id="assignResult"></div>
  </div>
+ <div class="card">
+  <h2>📎 Word yoki PDF fayldan test yuklash</h2>
+  <p class="muted">Fayl ichida har bir savol quyidagicha yozilgan bo‘lishi kerak:<br><b>1. 25 + 37 = ?</b><br>Javob: 62<br><br><b>2. Toshkent qaysi davlatning poytaxti?</b><br>Javob: O‘zbekiston</p>
+  <input id="testFileInput" type="file" accept=".docx,.pdf" onchange="handleTestFile(event)">
+  <div id="testFilePreview"></div>
+  <button class="green" onclick="saveManualAssignment()">💾 Shu savollarni topshiriq sifatida saqlash</button>
+ </div>
  <div class="card"><h2>📚 Berilgan topshiriqlar</h2><div id="assignmentList"></div></div>
 </section>
 
@@ -271,7 +278,10 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
 <div class="appBottomSpace"></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 const DBKEY="BILIM_USTOZ_V9";
 const today=()=>new Date().toISOString().slice(0,10);
 let data=load();
@@ -290,7 +300,7 @@ async function doSyncPush(){
     let r=await sb.from("children").upsert({id:c.id,parent_id:currentParentId,name:c.name,avatar:c.avatar,grade:c.grade,pin:c.pin,point_rate:c.pointRate,note:c.note,stats:c.stats||{}});
     if(r.error){alert("SYNC XATO (children): "+r.error.message);console.error(r.error)}
    }
-   for(const a of data.assignments){let r=await sb.from("assignments").upsert({id:a.id,child_id:a.child,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status});if(r.error){alert("SYNC XATO (assignments): "+r.error.message)}}
+   for(const a of data.assignments){let r=await sb.from("assignments").upsert({id:a.id,child_id:a.child,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,questions:a.questions||[]});if(r.error){alert("SYNC XATO (assignments): "+r.error.message)}}
    for(const h of data.homes){let r=await sb.from("homes").upsert({id:h.id,child_id:h.child,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status});if(r.error){alert("SYNC XATO (homes): "+r.error.message)}}
    for(const act of data.activity){let r=await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts});if(r.error){alert("SYNC XATO (activity): "+r.error.message)}}
   }else if(session.role==="child"&&session.userId){
@@ -315,7 +325,7 @@ async function pullFromSupabase(parentId){
   let childIds=data.children.map(c=>c.id);
   if(childIds.length){
    let {data:assigns}=await sb.from("assignments").select("*").in("child_id",childIds);
-   data.assignments=(assigns||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,created:new Date(a.created_at).getTime()}));
+   data.assignments=(assigns||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,questions:a.questions||[],created:new Date(a.created_at).getTime()}));
    let {data:homesRows}=await sb.from("homes").select("*").in("child_id",childIds);
    data.homes=(homesRows||[]).map(h=>({id:h.id,child:h.child_id,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status}));
    let {data:activityRows}=await sb.from("activity").select("*").in("child_id",childIds).order("ts",{ascending:true});
@@ -443,8 +453,66 @@ function fillSelect(idv){
 
 function addAssignment(){
  let child=assignChild.value;if(!child){alert("Bola tanlang.");return}
- data.assignments.push({id:id(),child,type:assignType.value,subject:assignSubject.value,topic:assignTopic.value.trim()||"Avtomatik mavzu",count:Number(assignCount.value)||0,bonus:Number(assignBonus.value)||0,note:assignNote.value.trim(),status:"waiting",created:Date.now()});
+ data.assignments.push({id:id(),child,type:assignType.value,subject:assignSubject.value,topic:assignTopic.value.trim()||"Avtomatik mavzu",count:Number(assignCount.value)||0,bonus:Number(assignBonus.value)||0,note:assignNote.value.trim(),status:"waiting",created:Date.now(),questions:[]});
  save();assignTopic.value="";assignNote.value="";refreshParent()
+}
+
+// ============ FAYLDAN (WORD/PDF) TEST YUKLASH ============
+window.__pendingQuestions=[];
+function parseTestText(text){
+ text=String(text||"").replace(/\r/g,"");
+ let blocks=text.split(/\n(?=\s*\d+[.\)]\s)/);
+ let out=[];
+ for(let b of blocks){
+  b=b.trim();if(!b)continue;
+  let m=b.match(/^\d+[.\)]\s*/);
+  let body=m?b.slice(m[0].length):b;
+  let ansMatch=body.match(/(?:javob|otvet|answer|j)\s*[:\-]\s*(.+)$/im);
+  if(!ansMatch)continue;
+  let answer=ansMatch[1].trim();
+  let question=body.slice(0,ansMatch.index).trim();
+  if(question&&answer)out.push({q:question,a:answer});
+ }
+ return out;
+}
+async function handleTestFile(e){
+ let f=e.target.files[0];if(!f)return;
+ document.getElementById("testFilePreview").innerHTML='<p class="muted">Fayl o‘qilmoqda...</p>';
+ try{
+  let text="";
+  if(f.name.toLowerCase().endsWith(".pdf")){
+   let buf=await f.arrayBuffer();
+   let pdf=await pdfjsLib.getDocument({data:buf}).promise;
+   for(let i=1;i<=pdf.numPages;i++){
+    let page=await pdf.getPage(i);
+    let content=await page.getTextContent();
+    text+=content.items.map(it=>it.str).join(" ")+"\n";
+   }
+  }else{
+   let buf=await f.arrayBuffer();
+   let result=await mammoth.extractRawText({arrayBuffer:buf});
+   text=result.value;
+  }
+  let qs=parseTestText(text);
+  window.__pendingQuestions=qs;
+  if(qs.length===0){
+   document.getElementById("testFilePreview").innerHTML='<div class="notice">Savollar topilmadi. Fayl formatini tekshiring: har bir savol "1. Savol matni" bilan boshlanib, keyingi qatorda "Javob: ..." bo‘lishi kerak.</div>';
+  }else{
+   document.getElementById("testFilePreview").innerHTML=`<div class="notice success">${qs.length} ta savol topildi ✅</div>`+qs.map((q,i)=>`<div class="task"><b>${i+1}. ${esc(q.q)}</b><br>Javob: ${esc(q.a)}</div>`).join("");
+  }
+ }catch(err){
+  document.getElementById("testFilePreview").innerHTML='<p class="error">Faylni o‘qishda xato: '+esc(err.message)+'</p>';
+ }
+}
+function saveManualAssignment(){
+ let qs=window.__pendingQuestions||[];
+ if(qs.length===0){alert("Avval fayldan savollarni yuklang.");return}
+ let child=assignChild.value;if(!child){alert("Bolani tanlang.");return}
+ data.assignments.push({id:id(),child,type:"custom",subject:assignSubject.value,topic:assignTopic.value.trim()||"Fayldan yuklangan test",count:qs.length,bonus:Number(assignBonus.value)||0,note:assignNote.value.trim(),status:"waiting",created:Date.now(),questions:qs});
+ save();
+ document.getElementById("testFilePreview").innerHTML="";document.getElementById("testFileInput").value="";window.__pendingQuestions=[];
+ refreshParent();
+ alert("Test topshiriq sifatida saqlandi!");
 }
 async function generateAIAssignment(){
  let cid=assignChild.value,c=childById(cid);if(!c){alert("Bola tanlang.");return}
@@ -648,7 +716,7 @@ function russianLessonText(l){
 function speakCurrentLesson(){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance("Hello! Let's learn English. Apple, book, cat, dog, school.");u.lang="en-US";speechSynthesis.speak(u)}
 
 function startMode(mode){
- session.mode=mode;session.answered=0;session.correct=0;session.block=0;
+ session.mode=mode;session.answered=0;session.correct=0;session.block=0;session.assignmentId=null;session.manualIndex=0;session.blockLimit=mode==="test"?10:5;
  if(mode==="lesson"){renderTeachingStep();return}
  nextAdaptiveQuestion()
 }
@@ -710,9 +778,20 @@ function renderTeachingStep(){
 }
 function speakEnglishExamples(){let st=statFor(currentChild(),"english"),arr=englishExamples(st.level);let u=new SpeechSynthesisUtterance(arr.join(". "));u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}
 function nextAdaptiveQuestion(){
- let c=currentChild(),st=statFor(c,session.subject),q=makeQuestion(session.subject,st.level,c.grade);
+ let c=currentChild(),st=statFor(c,session.subject);
+ let asg=session.assignmentId?data.assignments.find(x=>x.id===session.assignmentId):null;
+ let q;
+ if(asg&&asg.questions&&asg.questions.length>0){
+  session.manualIndex=session.manualIndex||0;
+  if(session.manualIndex>=asg.questions.length){finishBlock();return}
+  let mq=asg.questions[session.manualIndex];
+  q={q:mq.q,a:mq.a,explain:"To‘g‘ri javob: "+mq.a};
+  session.manualIndex++;
+ }else{
+  q=makeQuestion(session.subject,st.level,c.grade);
+ }
  session.current=q;session.block++;
- let isTest=session.mode==="test",limit=isTest?10:5;
+ let limit=session.blockLimit||(session.mode==="test"?10:5);
  learningArea.innerHTML=`<div class="lessonBox"><div class="row"><span class="badge">${session.mode==="test"?"📝 Test":"✏️ Mashq"}</span><span class="badge">Daraja ${st.level}</span><span class="badge">${session.block}/${limit}</span></div><div class="question">${q.q}</div>${q.speak?`<div class="center"><button class="gray" onclick="speakWord('${esc(q.speak)}')">🔊 Talaffuz</button></div>`:""}${q.choices?`<div class="choices">${q.choices.map(ch=>`<button class="choice" onclick="answerQuestion('${encodeURIComponent(ch)}')">${esc(ch)}</button>`).join("")}</div>`:`<input id="answerInput" class="answer" placeholder="Javobingiz"><div class="center"><button class="primary" onclick="answerQuestion()">Javob berish</button></div>`}<div id="feedback"></div></div>`;
  if(!q.choices)setTimeout(()=>document.getElementById("answerInput")?.focus(),50)
 }
@@ -730,7 +809,7 @@ function answerQuestion(choiceEnc){
  save();
  setTimeout(()=>{
   adaptLevel(st);
-  let limit=session.mode==="test"?10:5;
+  let limit=session.blockLimit||(session.mode==="test"?10:5);
   if(session.block>=limit)finishBlock();else nextAdaptiveQuestion()
  },700)
 }
@@ -745,6 +824,7 @@ function adaptLevel(st){
 function finishBlock(){
  let pct=Math.round(session.correct/session.answered*100),st=statFor(currentChild(),session.subject);
  if(session.mode==="test"&&pct>=80){st.level=Math.min(12,st.level+1);save()}
+ if(session.assignmentId){let a=data.assignments.find(x=>x.id===session.assignmentId);if(a){a.status="done";save()}}
  learningArea.innerHTML=`<div class="hero"><div class="big">${pct>=80?"🏆":"👏"}</div><h2>${session.mode==="test"?"Test":"Mashq bloki"} tugadi</h2><div class="stars">⭐ ${session.correct}/${session.answered} — ${pct}%</div><p>Hozirgi daraja: <b>${st.level}</b></p><p class="muted">Kunlik limit yo‘q. Kuchingiz va qiziqishingizga qarab davom etishingiz mumkin.</p><button class="green" onclick="session.answered=0;session.correct=0;session.block=0;nextAdaptiveQuestion()">Yana davom etish</button> <button class="gray" onclick="showLessonIntro()">Bugunga yetarli</button></div>`
 }
 function makeQuestion(s,l,g){
@@ -934,7 +1014,7 @@ function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}function pick(a){re
 function speakWord(w){let u=new SpeechSynthesisUtterance(w);u.lang=session.subject==="russian"?"ru-RU":"en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}
 
 function startAssignment(aid){
- let a=data.assignments.find(x=>x.id===aid);if(!a)return;a.status="started";save();session.subject=a.subject;openLearn(a.subject);session.mode=a.type==="test"?"test":"practice";session.assignmentId=aid;nextAdaptiveQuestion()
+ let a=data.assignments.find(x=>x.id===aid);if(!a)return;a.status="started";save();session.subject=a.subject;openLearn(a.subject);session.mode=a.type==="test"?"test":"practice";session.assignmentId=aid;session.manualIndex=0;session.blockLimit=(a.questions&&a.questions.length>0)?a.questions.length:(a.type==="test"?10:5);nextAdaptiveQuestion()
 }
 
 function startGame(type){
