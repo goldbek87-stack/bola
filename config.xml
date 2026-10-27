@@ -1,29 +1,28 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.oila.bilimvamukofot" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.oila.bilimvamukofot" version="1.0.0" android-versionCode="1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Bilim va Mukofot</name>
     <description>
         O'qish, uy ishlari, ball va mukofot uchun oilaviy ilova.
     </description>
-    <author email="info@example.com" href="https://example.com">
-        Bilim va Mukofot jamoasi
+    <author email="goldbek87@gmail.com" href="https://goldbek87-stack.github.io/bola/privacy.html">
+        Bilim va Mukofot
     </author>
 
     <content src="index.html" />
 
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
+    <access origin="https://hnyjnsmuonfynosxltlo.supabase.co" />
     <allow-intent href="https://*/*" />
 
     <preference name="DisallowOverscroll" value="true" />
-    <preference name="android-minSdkVersion" value="22" />
-    <preference name="android-targetSdkVersion" value="34" />
+    <preference name="android-minSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="36" />
     <preference name="Orientation" value="default" />
     <preference name="Fullscreen" value="false" />
 
     <platform name="android">
-        <allow-intent href="market:*" />
+        <icon src="res/icon.png" />
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
-            <application android:usesCleartextTraffic="true" />
+            <application android:usesCleartextTraffic="false" />
         </edit-config>
     </platform>
 </widget>

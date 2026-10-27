@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bilim Ustoz V9 Android</title>
 <style>
 *{box-sizing:border-box}
@@ -55,6 +55,7 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
   button{min-height:44px}
   input,select,textarea{font-size:16px}
 }
+body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -211,7 +212,7 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
   </div>
   <textarea id="assignNote" placeholder="Ota-onadan izoh yoki maxsus topshiriq"></textarea>
   <button class="primary" onclick="addAssignment()">📌 Topshiriq berish</button>
-  <button class="green" onclick="generateAIAssignment()">✨ AI yordamida yaratish</button>
+  <button class="green" onclick="generateAIAssignment()">✨ Avtomatik yaratish</button>
   <div id="assignResult"></div>
  </div>
  <div class="card">
@@ -236,27 +237,6 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
  <div class="card"><h2>✅ Tasdiqlash</h2><div id="pendingHomes"></div></div>
 </section>
 
-<section id="parentAI" class="screen">
- <div class="card">
-  <h2>🤖 Sun’iy intellekt sozlamalari</h2>
-  <div class="notice"><b>1–11-sinf rejimi:</b> fanlar bolaning sinfiga qarab avtomatik chiqadi. Lokal generator bazaviy savollar beradi. Haqiqiy AI server ulansa, sinf, fan, mavzu, oldingi xatolar va darajaga mos yangi dars, test, savol va mantiqiy o‘yinlarni tashqi AI yaratishi mumkin. API kalitini HTML ichiga yozmang — server tomonda saqlang.</div>
-  <label>AI rejimi</label>
-  <select id="aiMode"><option value="local">Aqlli lokal generator (internet shart emas)</option><option value="server">Tashqi AI server</option></select>
-  <label>AI server manzili</label><input id="aiUrl" placeholder="Masalan: http://127.0.0.1:3000/generate">
-  <label>Standart til</label><select id="aiLang"><option value="uz">O‘zbek</option><option value="en">English</option></select>
-  <button class="primary" onclick="saveAISettings()">💾 Saqlash</button>
-  <button class="gray" onclick="testAI()">🧪 Tekshirish</button>
-  <div id="aiStatus"></div>
- </div>
- <div class="card">
-  <h2>✨ AI generator</h2>
-  <label>Bola</label><select id="aiChild"></select>
-  <label>So‘rov</label><textarea id="aiPrompt" placeholder="Masalan: Ingliz tilini 0 dan o‘rganayotgan 1-sinf bola uchun 5 ta dars, 10 ta mashq va 2 ta o‘yin yarat"></textarea>
-  <button class="green" onclick="runAIGenerator()">✨ Yaratish</button>
-  <div id="aiOutput"></div>
- </div>
-</section>
-
 <section id="parentSettings" class="screen">
  <div class="card">
   <h2>⚙️ Ota-ona sozlamalari</h2>
@@ -272,16 +252,20 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
   <h2>🗑 Tozalash</h2><p class="muted">Barcha ma’lumotlar o‘chadi.</p>
   <button class="red" onclick="resetAll()">Barchasini o‘chirish</button>
  </div>
+ <div class="card dangerZone">
+  <h2>⚠️ Akkauntni o‘chirish</h2><p class="muted">Ota-ona akkaunti, barcha bola profillari, topshiriqlar va ball/mukofot tarixi bulutdan butunlay o‘chiriladi. Bu amalni qaytarib bo‘lmaydi. Internet kerak.</p>
+  <button class="red" onclick="deleteAccount()">Akkauntni butunlay o‘chirish</button>
+ </div>
 </section>
 
 </section>
 <div class="appBottomSpace"></div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="lib/supabase.js"></script>
+<script src="lib/mammoth.browser.min.js"></script>
+<script src="lib/pdf.min.js"></script>
 <script>
-if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc="lib/pdf.worker.min.js";
 const DBKEY="BILIM_USTOZ_V9";
 const today=()=>new Date().toISOString().slice(0,10);
 let data=load();
@@ -301,18 +285,22 @@ async function doSyncPush(){
   if(session.role==="parent"&&currentParentId){
    for(const c of data.children){
     let r=await sb.from("children").upsert({id:c.id,parent_id:currentParentId,name:c.name,avatar:c.avatar,grade:c.grade,pin:c.pin,point_rate:c.pointRate,note:c.note,stats:c.stats||{}});
-    if(r.error){alert("SYNC XATO (children): "+r.error.message);console.error(r.error)}
+    if(r.error){console.error(r.error);console.error(r.error)}
    }
-   for(const a of data.assignments){let r=await sb.from("assignments").upsert({id:a.id,child_id:a.child,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,questions:a.questions||[]});if(r.error){alert("SYNC XATO (assignments): "+r.error.message)}}
-   for(const h of data.homes){let r=await sb.from("homes").upsert({id:h.id,child_id:h.child,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status});if(r.error){alert("SYNC XATO (homes): "+r.error.message)}}
-   for(const act of data.activity){let r=await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts});if(r.error){alert("SYNC XATO (activity): "+r.error.message)}}
+   for(const a of data.assignments){let r=await sb.from("assignments").upsert({id:a.id,child_id:a.child,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,questions:a.questions||[]});if(r.error){console.error(r.error)}}
+   for(const h of data.homes){let r=await sb.from("homes").upsert({id:h.id,child_id:h.child,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status});if(r.error){console.error(r.error)}}
+   for(const act of data.activity){let r=await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts});if(r.error){console.error(r.error)}}
   }else if(session.role==="child"&&session.userId){
-   let cid=session.userId;
-   for(const a of data.assignments.filter(x=>x.child===cid)){await sb.from("assignments").update({status:a.status}).eq("id",a.id)}
-   for(const h of data.homes.filter(x=>x.child===cid)){await sb.from("homes").update({status:h.status}).eq("id",h.id)}
-   for(const act of data.activity.filter(x=>x.child===cid)){await sb.from("activity").upsert({id:act.id,child_id:act.child,type:act.type,title:act.title,points:act.points,money:act.money,date:act.date,ts:act.ts})}
+   let cid=session.userId,cc=childById(cid);if(!cc)return;
+   let r=await sb.rpc("child_push",{
+    p_child:cid,p_pin:cc.pin,
+    p_assignments:data.assignments.filter(x=>x.child===cid).map(a=>({id:a.id,status:a.status})),
+    p_homes:data.homes.filter(x=>x.child===cid).map(h=>({id:h.id,status:h.status})),
+    p_activity:data.activity.filter(x=>x.child===cid).slice(-500).map(a=>({id:a.id,type:a.type,title:a.title,points:Math.round(a.points||0),money:Math.round(a.money||0),date:a.date,ts:a.ts}))
+   });
+   if(r.error)console.error("child_push xato:",r.error)
   }
- }catch(e){alert("SYNC XATO (umumiy): "+e.message);console.error("Supabase sync xatosi:",e)}
+ }catch(e){console.error("Supabase sync xatosi:",e)}
 }
 async function pullFromSupabase(parentId){
  try{
@@ -344,8 +332,7 @@ function defaults(){
   children:[],
   assignments:[],
   homes:[],
-  activity:[],
-  ai:{mode:"local",url:"",lang:"uz"}
+  activity:[]
  };
 }
 function load(){try{return JSON.parse(localStorage.getItem(DBKEY))||defaults()}catch(e){return defaults()}}
@@ -420,7 +407,6 @@ function openApp(){
    <button class="nav" onclick="activateNav(this);showScreen('parentChildren');refreshParent()">👶 Bolalar</button>
    <button class="nav" onclick="activateNav(this);showScreen('parentAssign');refreshParent()">📝 Topshiriq</button>
    <button class="nav" onclick="activateNav(this);showScreen('parentHome');refreshParent()">🏠 Uy ishi</button>
-   <button class="nav" onclick="activateNav(this);showScreen('parentAI');refreshParent()">🤖 AI</button>
    <button class="nav" onclick="activateNav(this);showScreen('parentSettings');refreshParent()">⚙️ Sozlama</button>`;
   showScreen("parentDash");refreshParent()
  }else{
@@ -525,7 +511,7 @@ async function generateAIAssignment(){
  document.getElementById("assignResult").innerHTML='<p class="muted">Yaratilmoqda...</p>';
  let out=await aiGenerate(prompt,c,assignSubject.value);
  assignNote.value=out.text||out;
- document.getElementById("assignResult").innerHTML='<p class="success">AI taklif tayyorladi. Xohlasangiz tahrirlab “Topshiriq berish”ni bosing.</p>'
+ document.getElementById("assignResult").innerHTML='<p class="success">Taklif tayyorlandi. Xohlasangiz tahrirlab “Topshiriq berish”ni bosing.</p>'
 }
 
 function addHome(){
@@ -550,10 +536,9 @@ function refreshParent(){
    return `<div class="task"><b>${c.avatar} ${esc(c.name)}</b><p>Takrorlash: <b>${subjectName(w.s)} ${w.p}%</b> • Kuchli: <b>${subjectName(best.s)} ${best.p}%</b></p></div>`;
  }).join("")||'<div class="notice">Bola qo‘shilmagan.</div>';
  childrenManage.innerHTML=data.children.map(c=>`<div class="profile"><div class="avatar">${c.avatar}</div><div class="info"><b>${esc(c.name)}</b><div class="muted">${c.grade}-sinf • PIN: ${esc(c.pin)} • 1 ball = ${money(c.pointRate)}</div><div class="small">${esc(c.note||"")}</div></div><button class="gray" onclick="editChild('${c.id}')">Tahrirlash</button><button class="red" onclick="deleteChild('${c.id}')">O‘chirish</button></div>`).join("")||'<div class="notice">Bola qo‘shilmagan.</div>';
- ["assignChild","homeChild","aiChild"].forEach(fillSelect);
+ ["assignChild","homeChild"].forEach(fillSelect);
  assignmentList.innerHTML=data.assignments.slice().reverse().map(a=>{let c=childById(a.child);return `<div class="task"><b>${c?.avatar||"🧒"} ${esc(c?.name||"")}</b> • ${subjectName(a.subject)} • ${esc(a.topic)} <span class="pill">${a.status}</span><p>${esc(a.note||"")}</p></div>`}).join("")||'<div class="notice">Topshiriqlar yo‘q.</div>';
  pendingHomes.innerHTML=data.homes.filter(h=>h.status==="claimed").map(h=>{let c=childById(h.child);return `<div class="task"><b>${c?.avatar||"🧒"} ${esc(c?.name||"")}</b><p>🏠 ${esc(h.title)} — ${money(h.reward)}</p><button class="green" onclick="approveHome('${h.id}',1)">To‘liq</button> <button class="orange" onclick="approveHome('${h.id}',.5)">Qisman</button> <button class="red" onclick="rejectHome('${h.id}')">Rad</button></div>`}).join("")||'<div class="notice">Tasdiqlanadigan ish yo‘q.</div>';
- aiMode.value=data.ai.mode;aiUrl.value=data.ai.url;aiLang.value=data.ai.lang
 }
 function refreshChild(){
  let c=currentChild();if(!c)return;renderSubjectGrid();let acts=data.activity.filter(a=>a.child===c.id);
@@ -778,7 +763,7 @@ function renderTeachingStep(){
  chemistry:["H₂O — suv","O₂ — kislorod"],
  informatics:["Algoritm → qadamlar ketma-ketligi"],
  logic:["2, 4, 6, 8, ... → 10"]
-}[s]||["Mavzu bo‘yicha AI yoki lokal generator yangi misollar yaratadi."];
+}[s]||["Mavzu bo‘yicha generator yangi misollar yaratadi."];
  learningArea.innerHTML=`<div class="lessonBox"><h2>📖 Tushuntirish</h2><p class="lessonText">${lessonText(s,st.level,c.grade)}</p><h3>Misollar</h3>${examples.map(x=>`<div class="task">${x}</div>`).join("")}<div class="center">${s==="english"?'<button class="gray" onclick="speakEnglishExamples()">🔊 Talaffuz</button>':""} <button class="green" onclick="session.mode='practice';nextAdaptiveQuestion()">Mashq qilamiz ➜</button></div></div>`
 }
 function speakEnglishExamples(){let st=statFor(currentChild(),"english"),arr=englishExamples(st.level);let u=new SpeechSynthesisUtterance(arr.join(". "));u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u)}
@@ -1092,18 +1077,7 @@ function startListeningGame(){
 function speakGameWord(w,lang){let u=new SpeechSynthesisUtterance(decodeURIComponent(w));u.lang=lang==="english"?"en-US":"ru-RU";speechSynthesis.cancel();speechSynthesis.speak(u)}
 function finishListening(a,b){let ok=decodeURIComponent(a)===decodeURIComponent(b);gameArea.innerHTML=`<h2>${ok?"✅ To‘g‘ri!":"❌ To‘g‘ri javob: "+decodeURIComponent(b)}</h2><button class="green" onclick="startListeningGame()">Yana</button>`}
 
-function saveAISettings(){data.ai={mode:aiMode.value,url:aiUrl.value.trim(),lang:aiLang.value};save();aiStatus.innerHTML='<p class="success">Sozlamalar saqlandi.</p>'}
-async function testAI(){aiStatus.innerHTML="<p>Tekshirilmoqda...</p>";try{let r=await aiGenerate("Salom. Bitta sodda matematika savoli yarat.",data.children[0],"math");aiStatus.innerHTML=`<div class="notice">${esc(r.text||r)}</div>`}catch(e){aiStatus.innerHTML=`<p class="error">${esc(e.message)}</p>`}}
-async function runAIGenerator(){
- let c=childById(aiChild.value);if(!c){alert("Bola tanlang.");return}aiOutput.innerHTML="<p>Yaratilmoqda...</p>";
- try{let r=await aiGenerate(aiPrompt.value||`${c.grade}-sinf uchun qiziqarli aralash topshiriqlar yarat`,c,"logic");aiOutput.innerHTML=`<div class="task" style="white-space:pre-wrap">${esc(r.text||r)}</div>`}catch(e){aiOutput.innerHTML=`<p class="error">${esc(e.message)}</p>`}
-}
 async function aiGenerate(prompt,c,subject){
- if(data.ai.mode==="server"&&data.ai.url){
-  let res=await fetch(data.ai.url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,child:{name:c?.name,grade:c?.grade},subject})});
-  if(!res.ok)throw new Error("AI server javob bermadi: "+res.status);
-  let j=await res.json();return {text:j.text||j.output||JSON.stringify(j)}
- }
  let g=c?.grade||1;
  let samples=[];
  for(let i=0;i<8;i++){let q=makeQuestion(subject||"logic",Math.max(1,g),g);samples.push(`${i+1}. ${q.q}  [Javob: ${q.a}]`)}
@@ -1112,6 +1086,18 @@ async function aiGenerate(prompt,c,subject){
 function changeParentPin(){let p=newParentPin.value.trim();if(!/^\d{4}$/.test(p)){alert("4 raqam kiriting.");return}data.parentPin=p;save();newParentPin.value="";alert("PIN o‘zgardi.")}
 function backup(){let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="bilim_ustoz_backup.json";a.click();URL.revokeObjectURL(u)}
 function restoreBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Backup tiklandi.");refreshParent()}catch(err){alert("Backup fayli noto‘g‘ri.")}};r.readAsText(f)}
+async function deleteAccount(){
+ if(session.role!=="parent"||!currentParentId){alert("Akkauntni o‘chirish uchun ota-ona sifatida kiring.");return}
+ if(!confirm("Akkaunt va barcha bolalar ma’lumotlari butunlay o‘chiriladi. Davom etasizmi?"))return;
+ if(!confirm("Oxirgi tasdiq: bu amalni qaytarib bo‘lmaydi. Rostdan ham o‘chirasizmi?"))return;
+ try{
+  let {error}=await sb.rpc("delete_my_account");
+  if(error){alert("O‘chirib bo‘lmadi: "+error.message+". Internetni tekshirib qayta urining yoki goldbek87@gmail.com ga yozing.");return}
+  try{await sb.auth.signOut()}catch(e){}
+  localStorage.removeItem(DBKEY);data=defaults();currentParentId=null;
+  alert("Akkaunt va barcha ma’lumotlar o‘chirildi.");logout()
+ }catch(e){alert("Xatolik: "+e.message)}
+}
 function resetAll(){if(confirm("Haqiqatan ham barcha ma’lumotlarni o‘chirasizmi?")){localStorage.removeItem(DBKEY);data=defaults();logout()}}
 
 // ============ AVTOMATIK KIRISH (agar oldin login qilingan bo'lsa) ============
