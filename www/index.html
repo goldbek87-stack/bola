@@ -56,6 +56,9 @@ textarea{min-height:95px;resize:vertical}.row{display:flex;gap:10px;align-items:
   input,select,textarea{font-size:16px}
 }
 body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+.pwWrap{position:relative}.pwWrap input{padding-right:52px}
+.pwEye{position:absolute;right:4px;top:5px;bottom:12px;background:transparent!important;border:0;padding:0 12px;font-size:20px;min-height:0!important;width:auto}
+.remRow{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:14px;font-weight:600}.remRow input{width:auto;margin:0;transform:scale(1.2)}
 </style>
 </head>
 <body>
@@ -81,7 +84,8 @@ body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset
  <div><div class="brand">🎓 Bilim Ustoz V9 Android</div><div class="muted" id="headerSub">Aqlli o‘quv tizimi</div></div>
  <div class="topActions">
    <span class="badge" id="headerUser">—</span>
-   <button class="gray" onclick="logout()">Chiqish</button>
+   <button class="gray" onclick="switchMode()">🔁 Rejim</button>
+   <button class="gray" onclick="logoutAll()">🚪 Chiqish</button>
  </div>
 </header>
 <nav id="mainNav"></nav>
@@ -161,6 +165,7 @@ body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset
 </section>
 
 <section id="parentChildren" class="screen">
+ <div class="card"><h2>🔑 Oila kodi</h2><p class="muted">Bola ilovaga kirganda shu kodni, ismini va PIN ni kiritadi. Kodni begonalarga bermang.</p><div id="familyCodeBox" style="font-size:28px;font-weight:800;letter-spacing:3px;margin:8px 0">—</div><button class="gray" onclick="newFamilyCode()">🔄 Kodni yangilash</button></div>
  <div class="card">
   <h2>👶 Bola qo‘shish / profil sozlamalari</h2>
   <div class="grid2">
@@ -279,6 +284,30 @@ let currentParentId=null;
 async function ensureParentRow(uid){
  try{let r=await sb.from("parents").upsert({id:uid});if(r.error)console.error("parents upsert xato:",r.error)}catch(e){console.error(e)}
 }
+async function loadFamilyCode(){
+ try{let {data:r,error}=await sb.from("parents").select("family_code").eq("id",currentParentId).single();if(error)throw error;window.familyCode=r.family_code||""}catch(e){console.error("Oila kodi xato:",e)}
+ renderFamilyCode()
+}
+function renderFamilyCode(){let b=document.getElementById("familyCodeBox");if(!b)return;let c=window.familyCode||"";b.textContent=c?c.slice(0,4)+"-"+c.slice(4):"—"}
+async function newFamilyCode(){
+ if(!confirm("Yangi kod olinadi, eski kod ishlamay qoladi. Davom etasizmi?"))return;
+ let {data:v,error}=await sb.rpc("new_family_code");
+ if(error){alert("Kodni yangilab bo‘lmadi: "+error.message);return}
+ window.familyCode=v;renderFamilyCode()
+}
+function switchMode(){setRem({last:null});logout(true)}
+function logoutAll(){setRem({last:null,pin:""});logout()}
+async function resumeParent(){
+ try{
+  let {data:{session:ss}}=await sb.auth.getSession();
+  if(!ss||!ss.user)return false;
+  currentParentId=ss.user.id;
+  if(data.ownerId!==currentParentId){data=defaults()}data.ownerId=currentParentId;
+  await ensureParentRow(currentParentId);await pullFromSupabase(currentParentId);await loadFamilyCode();
+  setRem({last:"parent"});
+  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp();return true
+ }catch(e){console.error(e);return false}
+}
 function syncPush(){doSyncPush()}
 async function doSyncPush(){
  try{
@@ -356,12 +385,48 @@ function showScreen(idv){
 function activateNav(btn){
  document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active")); if(btn)btn.classList.add("active")
 }
-function showParentLogin(){
- document.getElementById("loginArea").innerHTML=`<h3>👨‍👩‍👧 Ota-ona</h3><input id="parentEmail" type="email" placeholder="Email"><input id="parentPassword" type="password" placeholder="Parol (kamida 6 belgi)"><div class="row"><button class="primary" onclick="parentLogin()">Kirish</button><button class="gray" onclick="parentSignup()">Ro‘yxatdan o‘tish</button></div><div id="loginErr"></div>`
+const REMKEY="BILIM_REMEMBER";
+function getRem(){try{return JSON.parse(localStorage.getItem(REMKEY))||{}}catch(e){return {}}}
+function setRem(o){try{localStorage.setItem(REMKEY,JSON.stringify({...getRem(),...o}))}catch(e){}}
+function pwField(id,ph,ac,extra){return `<div class="pwWrap"><input id="${id}" type="password" placeholder="${ph}" autocomplete="${ac}" ${extra||""}><button type="button" class="pwEye" onclick="togglePw('${id}',this)" aria-label="Ko‘rsatish / yashirish">👁</button></div>`}
+function togglePw(id,b){let i=document.getElementById(id),show=i.type==="password";i.type=show?"text":"password";b.textContent=show?"🙈":"👁"}
+function rememberParent(){let c=document.getElementById("rememberMe"),e=document.getElementById("parentEmail"),on=c?c.checked:true;setRem({email:on&&e?e.value.trim():"",stay:on,last:"parent"})}
+async function showParentLogin(){
+ if(getRem().stay!==false){document.getElementById("loginArea").innerHTML='<p class="muted">Kirilmoqda...</p>';if(await resumeParent())return}
+ renderParentForm()
 }
-function showChildLogin(){
- let opts=data.children.map(c=>`<option value="${c.id}">${c.avatar} ${esc(c.name)}</option>`).join("");
- document.getElementById("loginArea").innerHTML=`<h3>🧒 Bola kirishi</h3>${opts?`<select id="childLoginSelect">${opts}</select><input id="childLoginPin" type="password" maxlength="4" placeholder="Bola PIN"><button class="green" onclick="childLogin()">Kirish</button>`:`<div class="notice">Avval ota-ona profil yaratishi kerak.</div>`}<div id="loginErr"></div>`
+function renderParentForm(){
+ let r=getRem();
+ document.getElementById("loginArea").innerHTML=`<h3>👨‍👩‍👧 Ota-ona</h3><input id="parentEmail" type="email" placeholder="Email" autocomplete="username" value="${esc(r.email||"")}">${pwField("parentPassword","Parol (kamida 6 belgi)","current-password")}<label class="remRow"><input type="checkbox" id="rememberMe" ${r.stay===false?"":"checked"}> Eslab qolish (parol qayta so‘ralmaydi)</label><div class="row"><button class="primary" onclick="parentLogin()">Kirish</button><button class="gray" onclick="parentSignup()">Ro‘yxatdan o‘tish</button></div><div id="loginErr"></div>`
+}
+let nameTimer;
+function normCode(v){return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
+function onFamilyCodeInput(){
+ clearTimeout(nameTimer);let box=document.getElementById("childNameBox");
+ if(normCode(document.getElementById("childFamilyCode").value).length<8){box.innerHTML="";return}
+ nameTimer=setTimeout(()=>loadChildNames(),200)
+}
+async function loadChildNames(pref){
+ let box=document.getElementById("childNameBox"),inp=document.getElementById("childFamilyCode");if(!box||!inp)return;
+ let code=normCode(inp.value);if(code.length<8)return;
+ box.innerHTML='<p class="muted">Qidirilmoqda...</p>';
+ try{
+  let {data:list,error}=await sb.rpc("child_names",{p_code:code});if(error)throw error;
+  if(normCode(inp.value)!==code)return;
+  if(!list||!list.length){box.innerHTML='<p class="error">Bunday oila kodi topilmadi yoki bolalar qo‘shilmagan.</p>';return}
+  box.innerHTML='<select id="childLoginName">'+list.map(c=>`<option value="${esc(c.name)}">${esc(c.avatar||"👦")} ${esc(c.name)}</option>`).join("")+'</select>';
+  if(pref&&list.some(c=>c.name===pref))document.getElementById("childLoginName").value=pref
+ }catch(e){console.error(e);box.innerHTML='<p class="error">Internetga ulanib bo‘lmadi.</p>'}
+}
+async function showChildLogin(){
+ let r=getRem();
+ if(r.code&&r.name&&r.pin){document.getElementById("loginArea").innerHTML='<p class="muted">Kirilmoqda...</p>';if(await doChildLogin(r.code,r.name,r.pin,true,true))return}
+ renderChildForm()
+}
+function renderChildForm(){
+ let r=getRem();
+ document.getElementById("loginArea").innerHTML=`<h3>🧒 Bola kirishi</h3><input id="childFamilyCode" placeholder="Oila kodi" autocapitalize="characters" autocomplete="off" maxlength="9" oninput="onFamilyCodeInput()" value="${esc(r.code||"")}"><div id="childNameBox"></div>${pwField("childLoginPin","PIN","off",'maxlength="4" inputmode="numeric"')}<label class="remRow"><input type="checkbox" id="rememberMe" ${r.code===""?"":"checked"}> Eslab qolish (kod, ism va PIN)</label><button class="green" onclick="childLogin()">Kirish</button><div id="loginErr"></div>`;
+ if(r.code)loadChildNames(r.name)
 }
 async function parentLogin(){
  let email=document.getElementById("parentEmail").value.trim(),password=document.getElementById("parentPassword").value;
@@ -369,10 +434,11 @@ async function parentLogin(){
  document.getElementById("loginErr").innerHTML='<p class="muted">Kirilmoqda...</p>';
  let {data:authData,error}=await sb.auth.signInWithPassword({email,password});
  if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
- currentParentId=authData.user.id;
+ currentParentId=authData.user.id;if(data.ownerId!==currentParentId){data=defaults()}data.ownerId=currentParentId;rememberParent();
  document.getElementById("loginErr").innerHTML='<p class="muted">Ma’lumotlar yuklanmoqda...</p>';
  await ensureParentRow(currentParentId);
  await pullFromSupabase(currentParentId);
+ await loadFamilyCode();
  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
 async function parentSignup(){
@@ -382,18 +448,42 @@ async function parentSignup(){
  let {data:authData,error}=await sb.auth.signUp({email,password});
  if(error){document.getElementById("loginErr").innerHTML='<p class="error">'+esc(error.message)+'</p>';return}
  if(!authData.session){document.getElementById("loginErr").innerHTML='<p class="success">Ro‘yxatdan o‘tdingiz! Endi "Kirish" tugmasi orqali kiring.</p>';return}
- currentParentId=authData.user.id;
+ currentParentId=authData.user.id;if(data.ownerId!==currentParentId){data=defaults()}data.ownerId=currentParentId;rememberParent();
  await ensureParentRow(currentParentId);
  await pullFromSupabase(currentParentId);
+ await loadFamilyCode();
  session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
 }
-function childLogin(){
- let cid=document.getElementById("childLoginSelect").value,p=document.getElementById("childLoginPin").value,c=childById(cid);
- if(!c||p!==c.pin){document.getElementById("loginErr").innerHTML='<p class="error">PIN noto‘g‘ri</p>';return}
- session={role:"child",userId:cid,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp()
+async function childLogin(){
+ let err=document.getElementById("loginErr");
+ let code=normCode(document.getElementById("childFamilyCode").value),nameEl=document.getElementById("childLoginName"),name=nameEl?nameEl.value.trim():"",pin=document.getElementById("childLoginPin").value.trim();
+ if(!code||!name||!/^\d{4}$/.test(pin)){err.innerHTML='<p class="error">Oila kodini kiriting, ismingizni tanlang va 4 raqamli PIN yozing.</p>';return}
+ let rm=document.getElementById("rememberMe");
+ await doChildLogin(code,name,pin,!!(rm&&rm.checked),false)
 }
-function logout(){
- if(session.role==="parent"){sb.auth.signOut();currentParentId=null}
+async function doChildLogin(code,name,pin,remember,silent){
+ let setErr=h=>{if(silent)return;let e=document.getElementById("loginErr");if(e)e.innerHTML=h};
+ setErr('<p class="muted">Tekshirilmoqda...</p>');
+ try{
+  let {data:res,error}=await sb.rpc("child_login",{p_code:code,p_name:name,p_pin:pin});
+  if(error)throw error;
+  if(res&&res.locked){setErr('<p class="error">Juda ko‘p xato urinish. Bir necha daqiqadan keyin qayta urining.</p>');return false}
+  if(!res||!res.ok){if(silent)setRem({pin:""});setErr('<p class="error">Kod, ism yoki PIN noto‘g‘ri.</p>');return false}
+  let c=res.child;
+  data=defaults();
+  data.children=[{id:c.id,name:c.name,avatar:c.avatar||"👦",grade:c.grade||1,pin:c.pin,pointRate:c.point_rate||100,note:"",stats:c.stats||{},created:Date.now()}];
+  data.assignments=(res.assignments||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,subject:a.subject,topic:a.topic,count:a.count,bonus:a.bonus,note:a.note,status:a.status,questions:a.questions||[],created:new Date(a.created_at).getTime()}));
+  data.homes=(res.homes||[]).map(h=>({id:h.id,child:h.child_id,title:h.title,reward:h.reward,repeat:h.repeat,date:h.date,status:h.status}));
+  data.activity=(res.activity||[]).map(a=>({id:a.id,child:a.child_id,type:a.type,title:a.title,points:a.points,money:a.money,date:a.date,ts:a.ts})).sort((x,y)=>x.ts-y.ts);
+  localStorage.setItem(DBKEY,JSON.stringify(data));
+  setRem(remember?{code,name,pin,last:"child"}:{code:"",name:"",pin:"",last:"child"});
+  session={role:"child",userId:c.id,subject:null,mode:null,current:null,answered:0,correct:0,block:0};openApp();
+  return true
+ }catch(e){console.error(e);setErr('<p class="error">Internetga ulanib bo‘lmadi. Qayta urining.</p>');return false}
+}
+function logout(keep){
+ if(session.role==="parent"){if(!keep)sb.auth.signOut();currentParentId=null}
+ data=defaults();localStorage.removeItem(DBKEY);window.familyCode="";renderFamilyCode();
  session={role:null,userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
  document.getElementById("appScreen").classList.remove("active");document.getElementById("loginScreen").classList.add("active");document.getElementById("loginArea").innerHTML=""
 }
@@ -422,6 +512,7 @@ function openApp(){
 function saveChild(){
  let name=childName.value.trim(),pin=childPin.value.trim();
  if(!name||!/^\d{4}$/.test(pin)){alert("Ism va 4 raqamli PIN kiriting.");return}
+ if(data.children.some(x=>x.name.trim().toLowerCase()===name.toLowerCase())){alert("Bu ismli bola allaqachon bor. Boshqa ism yozing (masalan, ismga familiya harfini qo‘shing).");return}
  data.children.push({id:id(),name,avatar:childAvatar.value,grade:Number(childGrade.value),pin,pointRate:Number(pointRate.value)||100,note:childNote.value.trim(),stats:{},created:Date.now()});
  save();childName.value="";childPin.value="";childNote.value="";refreshParent()
 }
@@ -1094,24 +1185,20 @@ async function deleteAccount(){
   let {error}=await sb.rpc("delete_my_account");
   if(error){alert("O‘chirib bo‘lmadi: "+error.message+". Internetni tekshirib qayta urining yoki goldbek87@gmail.com ga yozing.");return}
   try{await sb.auth.signOut()}catch(e){}
-  localStorage.removeItem(DBKEY);data=defaults();currentParentId=null;
+  localStorage.removeItem(DBKEY);localStorage.removeItem(REMKEY);data=defaults();currentParentId=null;
   alert("Akkaunt va barcha ma’lumotlar o‘chirildi.");logout()
  }catch(e){alert("Xatolik: "+e.message)}
 }
 function resetAll(){if(confirm("Haqiqatan ham barcha ma’lumotlarni o‘chirasizmi?")){localStorage.removeItem(DBKEY);data=defaults();logout()}}
 
-// ============ AVTOMATIK KIRISH (agar oldin login qilingan bo'lsa) ============
+// ============ AVTOMATIK KIRISH ============
 (async function initSession(){
+ let r=getRem();
  try{
-  let {data:{session:s}}=await sb.auth.getSession();
-  if(s&&s.user){
-   currentParentId=s.user.id;
-   await ensureParentRow(currentParentId);
-   await pullFromSupabase(currentParentId);
-   session={role:"parent",userId:null,subject:null,mode:null,current:null,answered:0,correct:0,block:0};
-   openApp();
-  }
- }catch(e){console.error("Sessiyani tekshirishda xato:",e)}
+  if(r.stay===false){try{await sb.auth.signOut()}catch(e){}}
+  if(r.last==="child"&&r.code&&r.name&&r.pin){await doChildLogin(r.code,r.name,r.pin,true,true)}
+  else if(r.stay!==false&&r.last!==null&&r.last!=="child"){await resumeParent()}
+ }catch(e){console.error("Avtomatik kirish xatosi:",e)}
 })();
 </script>
 </body>
